@@ -1,3 +1,9 @@
 a.out
 i
 bigi
+makefile
+
+
+# Added by cargo
+
+/target
