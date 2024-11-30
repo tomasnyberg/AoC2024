@@ -2,22 +2,16 @@ use std::collections::HashMap;
 use std::io::{self, Read};
 
 fn part_one(a: &Vec<i32>, b: &Vec<i32>) {
-    let mut result = 0;
-    for i in 0..a.len() {
-        result += (a[i] - b[i]).abs();
-    }
+    let result: i32 = a.iter().zip(b.iter()).map(|(x, y)| (x - y).abs()).sum();
     println!("{}", result);
 }
 
 fn part_two(a: Vec<i32>, b: Vec<i32>) {
     let mut hm = HashMap::<i32, i32>::new();
-    for i in 0..b.len() {
-        *hm.entry(b[i]).or_insert(0) += 1;
-    }
-    let mut result = 0;
-    for i in 0..a.len() {
-        result += a[i] * hm.get(&a[i]).unwrap_or(&0);
-    }
+    b.iter().for_each(|x| {
+        *hm.entry(*x).or_insert(0) += 1;
+    });
+    let result: i32 = a.iter().map(|x| x * hm.get(x).unwrap_or(&0)).sum();
     println!("{}", result);
 }
 
