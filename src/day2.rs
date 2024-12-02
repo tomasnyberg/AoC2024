@@ -11,22 +11,19 @@ pub fn part_one(xss: &Vec<Vec<i32>>) -> i32 {
 }
 
 pub fn part_two(xss: Vec<Vec<i32>>) -> i32 {
-    let mut result = 0;
-    xss.iter().for_each(|xs| {
-        for i in 0..xs.len() {
-            let _xs_without: Vec<i32> = xs
-                .iter()
-                .enumerate()
-                .filter(|(j, _)| *j != i)
-                .map(|(_, x)| *x)
-                .collect();
-            if safe_report(_xs_without) == 1 {
-                result += 1;
-                break;
-            }
-        }
-    });
-    result
+    xss.iter()
+        .map(|xs| {
+            (0..xs.len()).any(|i| {
+                let xs_without: Vec<i32> = xs
+                    .iter()
+                    .enumerate()
+                    .filter(|(j, _)| *j != i)
+                    .map(|(_, x)| *x)
+                    .collect();
+                safe_report(xs_without) == 1
+            }) as i32
+        })
+        .sum()
 }
 
 pub fn solve() {
