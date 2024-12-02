@@ -1,6 +1,17 @@
 mod day1;
+mod day2;
+
+use std::collections::HashMap;
 
 fn main() {
-    day1::solve();
-    return;
+    let solutions: HashMap<&str, fn()> =
+        HashMap::from([("day1", day1::solve as fn()), ("day2", day2::solve as fn())]);
+
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() < 2 {
+        eprintln!("Usage: {} <day>", args[0]);
+        return;
+    }
+
+    solutions.get(&args[1].as_str()).unwrap()();
 }
