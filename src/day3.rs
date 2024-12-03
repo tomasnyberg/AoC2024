@@ -67,13 +67,7 @@ pub fn parse_mul(chars: &mut Peekable<Chars<'_>>) -> i32 {
     num_pair(chars)
 }
 
-pub fn part_one() {}
-
-pub fn part_two() {}
-
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn part_one(input: &String) -> i32 {
     let mut chars: Peekable<Chars<'_>> = input.chars().peekable();
     let mut result = 0;
     while chars.peek().is_some() {
@@ -85,5 +79,18 @@ pub fn solve() {
             }
         };
     }
-    println!("{}", result);
+    result
+}
+
+pub fn part_two() -> i32 {
+    0
+}
+
+pub fn solve() {
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap();
+    let part_one_result = part_one(&input);
+    let part_two_result = part_two();
+    println!("{}", part_one_result);
+    println!("{}", part_two_result);
 }
