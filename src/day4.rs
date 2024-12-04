@@ -32,17 +32,13 @@ fn find_xmas(matrix: &[Vec<char>], i: i32, j: i32, di: i32, dj: i32) -> i32 {
 fn find_x_mas(matrix: &[Vec<char>], i: i32, j: i32) -> i32 {
     let n = matrix.len() as i32;
     let m = matrix[0].len() as i32;
+    let in_bounds = |oi, oj| oi >= 0 && oi < n && oj >= 0 && oj < m;
     (DIRS_UP_DOWN
         .into_iter()
         .map(|((di1, dj1), (di2, dj2))| {
-            let oi1 = i + di1;
-            let oj1 = j + dj1;
-            let oi2 = i + di2;
-            let oj2 = j + dj2;
-            if oi1 < 0 || oi1 >= n || oj1 < 0 || oj1 >= m {
-                return 0;
-            }
-            if oi2 < 0 || oi2 >= n || oj2 < 0 || oj2 >= m {
+            let (oi1, oj1) = (i + di1, j + dj1);
+            let (oi2, oj2) = (i + di2, j + dj2);
+            if !in_bounds(oi1, oj1) || !in_bounds(oi2, oj2) {
                 return 0;
             }
             let m = matrix[oi1 as usize][oj1 as usize] == 'M'
@@ -55,40 +51,30 @@ fn find_x_mas(matrix: &[Vec<char>], i: i32, j: i32) -> i32 {
         == 2) as i32
 }
 
-fn part_one(matrix: &[Vec<char>]) -> i32 {
-    let mut result = 0;
+fn find_results(matrix: &[Vec<char>]) -> (i32, i32) {
+    let mut part_one_result = 0;
+    let mut part_two_result = 0;
     for i in 0..matrix.len() as i32 {
         for j in 0..matrix[0].len() as i32 {
-            for (di, dj) in DIRS8.iter() {
-                result += find_xmas(matrix, i, j, *di, *dj);
-            }
+            part_one_result += DIRS8
+                .iter()
+                .map(|(di, dj)| find_xmas(matrix, i, j, *di, *dj))
+                .sum::<i32>();
+            part_two_result +=
+                (matrix[i as usize][j as usize] == 'A') as i32 * find_x_mas(matrix, i, j)
         }
     }
-    result
-}
-
-fn part_two(matrix: &[Vec<char>]) -> i32 {
-    let mut result = 0;
-    for i in 0..matrix.len() as i32 {
-        for j in 0..matrix[0].len() as i32 {
-            if matrix[i as usize][j as usize] == 'A' {
-                result += find_x_mas(matrix, i, j);
-            }
-        }
-    }
-    result
+    (part_one_result, part_two_result)
 }
 
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
-    // read input into a 2x2 char matrix
     let matrix: Vec<Vec<char>> = input
         .lines()
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
-    let part_one_result = part_one(&matrix);
-    let part_two_result = part_two(&matrix);
+    let (part_one_result, part_two_result) = find_results(&matrix);
     println!("{:?}", part_one_result);
     println!("{:?}", part_two_result);
 }
