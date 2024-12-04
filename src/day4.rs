@@ -1,7 +1,17 @@
-use std::collections::HashMap;
 use std::io::{self, Read};
 
 const XMAS: [char; 4] = ['X', 'M', 'A', 'S'];
+
+const DIRS8: [(i32, i32); 8] = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+];
 
 fn find_xmas(matrix: &[Vec<char>], i: i32, j: i32, di: i32, dj: i32) -> i32 {
     for k in 0..4 {
@@ -17,7 +27,17 @@ fn find_xmas(matrix: &[Vec<char>], i: i32, j: i32, di: i32, dj: i32) -> i32 {
     1
 }
 
-fn part_one() {}
+fn part_one(matrix: &[Vec<char>]) -> i32 {
+    let mut result = 0;
+    for i in 0..matrix.len() as i32 {
+        for j in 0..matrix[0].len() as i32 {
+            for (di, dj) in DIRS8.iter() {
+                result += find_xmas(matrix, i, j, *di, *dj);
+            }
+        }
+    }
+    result
+}
 
 fn part_two() {}
 
@@ -29,23 +49,6 @@ pub fn solve() {
         .lines()
         .map(|line| line.chars().collect::<Vec<char>>())
         .collect::<Vec<Vec<char>>>();
-    let dirs8 = [
-        (-1, -1),
-        (-1, 0),
-        (-1, 1),
-        (0, -1),
-        (0, 1),
-        (1, -1),
-        (1, 0),
-        (1, 1),
-    ];
-    let mut result = 0;
-    for i in 0..matrix.len() as i32 {
-        for j in 0..matrix[0].len() as i32 {
-            for (di, dj) in dirs8.iter() {
-                result += find_xmas(&matrix, i, j, *di, *dj);
-            }
-        }
-    }
-    println!("{:?}", result);
+    let part_one_result = part_one(&matrix);
+    println!("{:?}", part_one_result);
 }
