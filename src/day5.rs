@@ -4,17 +4,15 @@ use std::io::{self, Read};
 fn part_one(lists: &[Vec<i32>], rules: &HashMap<i32, Vec<i32>>) -> (i32, Vec<usize>) {
     let mut result = 0;
     let mut bad_indices: Vec<usize> = vec![];
-    (0..lists.len()).for_each(|i| {
-        let list = &lists[i];
+    lists.iter().enumerate().for_each(|(i, list)| {
         let indices: HashMap<i32, usize> = list.iter().enumerate().map(|(i, &v)| (v, i)).collect();
-        let mut flag = false;
-        list.iter().enumerate().for_each(|(i, &v)| {
+        let flag = list.iter().enumerate().any(|(i, &v)| {
             for y in rules.get(&v).unwrap_or(&vec![]) {
                 if indices.get(y).unwrap_or(&1000) < &i {
-                    flag = true;
-                    break;
+                    return true;
                 }
             }
+            false
         });
         if !flag {
             result += list[list.len() / 2];
