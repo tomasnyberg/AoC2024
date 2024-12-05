@@ -1,9 +1,11 @@
 use std::collections::HashMap;
 use std::io::{self, Read};
 
-fn part_one(lists: &Vec<Vec<i32>>, rules: &HashMap<i32, Vec<i32>>) -> i32 {
+fn part_one(lists: &[Vec<i32>], rules: &HashMap<i32, Vec<i32>>) -> (i32, Vec<usize>) {
     let mut result = 0;
-    for list in lists {
+    let mut bad_indices: Vec<usize> = vec![];
+    (0..lists.len()).for_each(|i| {
+        let list = &lists[i];
         let indices: HashMap<i32, usize> = list.iter().enumerate().map(|(i, &v)| (v, i)).collect();
         let mut flag = false;
         list.iter().enumerate().for_each(|(i, &v)| {
@@ -16,12 +18,49 @@ fn part_one(lists: &Vec<Vec<i32>>, rules: &HashMap<i32, Vec<i32>>) -> i32 {
         });
         if !flag {
             result += list[list.len() / 2];
+        } else {
+            bad_indices.push(i);
         }
-    }
-    result
+    });
+    (result, bad_indices)
 }
 
-fn part_two() {}
+fn dfs(
+    curr: i32,
+    visited: &mut Vec<bool>,
+    topsort: &mut Vec<i32>,
+    rules: &HashMap<i32, Vec<i32>>,
+    indices: &HashMap<i32, usize>,
+) {
+    if visited[*indices.get(&curr).unwrap()] {
+        return;
+    }
+    visited[*indices.get(&curr).unwrap()] = true;
+    for nbr in rules.get(&curr).unwrap_or(&vec![]) {
+        if !indices.contains_key(nbr) {
+            continue;
+        }
+        dfs(*nbr, visited, topsort, rules, indices);
+    }
+    topsort.push(curr);
+}
+
+fn part_two(lists: &[Vec<i32>], rules: &HashMap<i32, Vec<i32>>, bad_indices: Vec<usize>) -> i32 {
+    let mut result: i32 = 0;
+    bad_indices.iter().for_each(|&i| {
+        let list = &lists[i];
+        let indices: HashMap<i32, usize> = list.iter().enumerate().map(|(i, &v)| (v, i)).collect();
+        let mut visited: Vec<bool> = vec![false; list.len()];
+        let mut topsort: Vec<i32> = vec![];
+        for i in 0..indices.len() {
+            if !visited[i] {
+                dfs(list[i], &mut visited, &mut topsort, rules, &indices);
+            }
+        }
+        result += topsort[topsort.len() / 2];
+    });
+    result
+}
 
 pub fn solve() {
     let mut input = String::new();
@@ -40,6 +79,8 @@ pub fn solve() {
         let b: i32 = parts.next().unwrap().parse::<i32>().unwrap();
         rules.entry(a).or_default().push(b);
     });
-    let result = part_one(&lists, &rules);
-    println!("{}", result);
+    let (result_part_one, bad_indices) = part_one(&lists, &rules);
+    let result_part_two = part_two(&lists, &rules, bad_indices);
+    println!("{}", result_part_one);
+    println!("{}", result_part_two);
 }
