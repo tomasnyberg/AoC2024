@@ -1,7 +1,25 @@
 use std::collections::HashMap;
 use std::io::{self, Read};
 
-fn part_one() {}
+fn part_one(lists: &Vec<Vec<i32>>, rules: &HashMap<i32, Vec<i32>>) -> i32 {
+    let mut result = 0;
+    for list in lists {
+        let indices: HashMap<i32, usize> = list.iter().enumerate().map(|(i, &v)| (v, i)).collect();
+        let mut flag = false;
+        list.iter().enumerate().for_each(|(i, &v)| {
+            for y in rules.get(&v).unwrap_or(&vec![]) {
+                if indices.get(y).unwrap_or(&1000) < &i {
+                    flag = true;
+                    break;
+                }
+            }
+        });
+        if !flag {
+            result += list[list.len() / 2];
+        }
+    }
+    result
+}
 
 fn part_two() {}
 
@@ -22,21 +40,6 @@ pub fn solve() {
         let b: i32 = parts.next().unwrap().parse::<i32>().unwrap();
         rules.entry(a).or_default().push(b);
     });
-    let mut result = 0;
-    for list in lists {
-        let indices: HashMap<i32, usize> = list.iter().enumerate().map(|(i, &v)| (v, i)).collect();
-        let mut flag = false;
-        list.iter().enumerate().for_each(|(i, &v)| {
-            for y in rules.get(&v).unwrap_or(&vec![]) {
-                if indices.get(y).unwrap_or(&1000) < &i {
-                    flag = true;
-                    break;
-                }
-            }
-        });
-        if !flag {
-            result += list[list.len() / 2];
-        }
-    }
-    println!("{:?}", result);
+    let result = part_one(&lists, &rules);
+    println!("{}", result);
 }
