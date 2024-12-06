@@ -18,14 +18,7 @@ fn _debug_print(matrix: &[Vec<char>], t_i: i32, t_j: i32, dir_idx: usize) {
     println!();
 }
 
-fn part_one() {}
-
-fn part_two() {}
-
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
-    let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+fn part_one(matrix: &[Vec<char>]) -> usize {
     let mut dir_idx: usize = 0;
     let target = '^';
     let mut t_i = 0;
@@ -56,5 +49,15 @@ pub fn solve() {
         t_i = oi;
         t_j = oj;
     }
-    println!("{}", visited.len());
+    visited.len()
+}
+
+fn part_two() {}
+
+pub fn solve() {
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap();
+    let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let part_one_result = part_one(&matrix);
+    println!("{}", part_one_result);
 }
