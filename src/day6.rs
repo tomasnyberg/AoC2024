@@ -124,7 +124,7 @@ fn find_loop(
         if oi < 0 || oi >= n || oj < 0 || oj >= m {
             break;
         }
-        if matrix[oi as usize][oj as usize] == '#' {
+        if matrix[oi as usize][oj as usize] == '#' || obs_i == oi && obs_j == oj {
             dir_idx = (dir_idx + 1) % 4;
             continue;
         }
@@ -148,9 +148,7 @@ fn part_two(
     part_one_visited
         .par_iter()
         .map(|&(i, j)| {
-            let mut local_matrix = matrix_copy.clone();
-            local_matrix[i as usize][j as usize] = '#';
-            let result = find_loop(&local_matrix, t_i, t_j, i, j, false, &jump_table);
+            let result = find_loop(matrix, t_i, t_j, i, j, false, &jump_table);
             if result.0 {
                 1
             } else {
