@@ -19,36 +19,27 @@ fn _debug_print(matrix: &[Vec<char>], t_i: i32, t_j: i32, dir_idx: usize) {
     println!();
 }
 
-fn part_one(matrix: &[Vec<char>], mut t_i: i32, mut t_j: i32) -> HashSet<(i32, i32)> {
-    let mut dir_idx: usize = 0;
-    let n = matrix.len() as i32;
-    let m = matrix[0].len() as i32;
-    let mut visited: HashSet<(i32, i32)> = HashSet::new();
-    loop {
-        visited.insert((t_i, t_j));
-        let (di, dj) = DIRS4[dir_idx];
-        let (oi, oj) = ((t_i + di), (t_j + dj));
-        if oi < 0 || oi >= n || oj < 0 || oj >= m {
-            break;
-        }
-        if matrix[oi as usize][oj as usize] == '#' {
-            dir_idx = (dir_idx + 1) % 4;
-            continue;
-        }
-        t_i = oi;
-        t_j = oj;
+fn part_one(matrix: &[Vec<char>], t_i: i32, t_j: i32) -> HashSet<(i32, i32)> {
+    let result = find_loop(matrix, t_i, t_j);
+    let mut visited_two: HashSet<(i32, i32)> = HashSet::new();
+    for (i, j, _) in result.1 {
+        visited_two.insert((i, j));
     }
-    visited
+    visited_two
 }
 
-fn find_loop(matrix: &[Vec<char>], mut t_i: i32, mut t_j: i32) -> bool {
+fn find_loop(
+    matrix: &[Vec<char>],
+    mut t_i: i32,
+    mut t_j: i32,
+) -> (bool, HashSet<(i32, i32, usize)>) {
     let n = matrix.len() as i32;
     let m = matrix[0].len() as i32;
     let mut visited_three: HashSet<(i32, i32, usize)> = HashSet::new();
     let mut dir_idx: usize = 0;
     loop {
         if visited_three.contains(&(t_i, t_j, dir_idx)) {
-            return true;
+            return (true, visited_three);
         }
         visited_three.insert((t_i, t_j, dir_idx));
         let (di, dj) = DIRS4[dir_idx];
@@ -63,7 +54,7 @@ fn find_loop(matrix: &[Vec<char>], mut t_i: i32, mut t_j: i32) -> bool {
         t_i = oi;
         t_j = oj;
     }
-    false
+    (false, visited_three)
 }
 
 fn part_two(
@@ -81,8 +72,8 @@ fn part_two(
         .map(|&(i, j)| {
             let mut local_matrix = matrix_copy.clone();
             local_matrix[i as usize][j as usize] = '#';
-            let has_loop = find_loop(&local_matrix, t_i, t_j);
-            if has_loop {
+            let result = find_loop(&local_matrix, t_i, t_j);
+            if result.0 {
                 1
             } else {
                 0
