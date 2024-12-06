@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::collections::HashSet;
 use std::io::{self, Read};
 
@@ -75,15 +76,19 @@ fn part_two(
     for row in matrix {
         matrix_copy.push(row.clone());
     }
-    let mut result = 0;
-    part_one_visited.iter().for_each(|&(i, j)| {
-        matrix_copy[i as usize][j as usize] = '#';
-        if find_loop(&matrix_copy, t_i, t_j) {
-            result += 1;
-        }
-        matrix_copy[i as usize][j as usize] = '.';
-    });
-    result
+    part_one_visited
+        .par_iter()
+        .map(|&(i, j)| {
+            let mut local_matrix = matrix_copy.clone();
+            local_matrix[i as usize][j as usize] = '#';
+            let has_loop = find_loop(&local_matrix, t_i, t_j);
+            if has_loop {
+                1
+            } else {
+                0
+            }
+        })
+        .sum()
 }
 
 pub fn solve() {
