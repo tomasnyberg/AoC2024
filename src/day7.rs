@@ -22,15 +22,8 @@ fn sum_results(part_one: bool, xss: &[Vec<i64>], targets: &[i64]) -> i64 {
         .sum::<i64>()
 }
 
-fn concat_vals(mut a: i64, b: i64) -> i64 {
-    if b >= 100 {
-        a *= 1000;
-    } else if b >= 10 {
-        a *= 100;
-    } else {
-        a *= 10;
-    }
-    a + b
+fn concat_vals(a: i64, b: i64) -> i64 {
+    (a * 10i64.pow(b.ilog10() + 1)) + b
 }
 
 fn dfs(target: i64, i: usize, matrix: &Vec<i64>, running: i64, part_one: bool) -> bool {
