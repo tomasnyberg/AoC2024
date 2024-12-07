@@ -1,6 +1,17 @@
 use std::io::{self, Read};
 
-fn part_one() {}
+fn part_one(xss: &[Vec<i64>], targets: &[i64]) -> i64 {
+    targets
+        .iter()
+        .zip(xss.iter())
+        .map(|(target, xs)| {
+            if dfs(*target, 1, xs, xs[0]) {
+                return target;
+            }
+            &0
+        })
+        .sum::<i64>()
+}
 
 fn part_two() {}
 
@@ -41,15 +52,6 @@ pub fn solve() {
         .iter()
         .map(|(s, _)| s.parse::<i64>().unwrap())
         .collect();
-    let result = targets
-        .iter()
-        .zip(xss.iter())
-        .map(|(target, xs)| {
-            if dfs(*target, 1, xs, xs[0]) {
-                return target;
-            }
-            &0
-        })
-        .sum::<i64>();
-    println!("{}", result);
+    let part_one_result = part_one(&xss, &targets);
+    println!("{}", part_one_result);
 }
