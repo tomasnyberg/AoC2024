@@ -1,24 +1,20 @@
+use rayon::prelude::*;
 use std::io::{self, Read};
 
 fn part_one(xss: &[Vec<i64>], targets: &[i64]) -> i64 {
-    targets
-        .iter()
-        .zip(xss.iter())
-        .map(|(target, xs)| {
-            if dfs(*target, 1, xs, xs[0], true) {
-                return target;
-            }
-            &0
-        })
-        .sum::<i64>()
+    sum_results(true, xss, targets)
 }
 
 fn part_two(xss: &[Vec<i64>], targets: &[i64]) -> i64 {
+    sum_results(false, xss, targets)
+}
+
+fn sum_results(part_one: bool, xss: &[Vec<i64>], targets: &[i64]) -> i64 {
     targets
-        .iter()
-        .zip(xss.iter())
+        .par_iter()
+        .zip(xss.par_iter())
         .map(|(target, xs)| {
-            if dfs(*target, 1, xs, xs[0], false) {
+            if dfs(*target, 1, xs, xs[0], part_one) {
                 return target;
             }
             &0
