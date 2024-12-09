@@ -1,25 +1,13 @@
-use std::cmp::{max, min, Reverse};
+use std::cmp::{max, Reverse};
 use std::collections::BinaryHeap;
 use std::collections::HashSet;
 use std::io::{self, Read};
-
-fn _dbg_print(disk: &[i64]) {
-    for &x in disk.iter() {
-        if x == -1 {
-            print! {"."};
-            continue;
-        }
-        print!("{}", x);
-    }
-    println!();
-}
 
 fn score(disk: &[i64], part_one: bool) -> i64 {
     let mut end = disk.iter().position(|&x| x == -1).unwrap();
     if !part_one {
         end = disk.len();
     }
-    _dbg_print(&disk[..end]);
     disk.iter()
         .enumerate()
         .take(end)
@@ -52,19 +40,21 @@ fn place_file(
     disk: &mut [i64],
     to_push: &mut Vec<(usize, i64)>,
 ) {
+    if to_push.is_empty() {
+        return;
+    }
     let mut earliest = -1;
     let mut earliest_index = 11;
-    for heap_size in to_push.len()..10 {
-        if heaps[heap_size].is_empty() {
-            continue;
+    (to_push.len()..10).for_each(|heap_size| {
+        if let Some(&Reverse(smallest)) = heaps[heap_size].peek() {
+            if earliest == -1 || smallest < earliest {
+                earliest = smallest;
+                earliest_index = heap_size;
+            }
         }
-        let smallest = heaps[heap_size].peek().unwrap().0;
-        if earliest == -1 || smallest < earliest {
-            earliest = smallest;
-            earliest_index = heap_size;
-        }
-    }
-    if earliest_index == 11 {
+    });
+
+    if earliest_index == 11 || earliest > to_push[to_push.len() - 1].0.try_into().unwrap() {
         to_push.clear();
         return;
     }
