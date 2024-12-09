@@ -16,17 +16,15 @@ pub fn part_one(original_disk: &Vec<i64>) -> i64 {
     let mut left = 0;
     let mut right = disk.len() - 1;
     while left < right {
-        if disk[left] != -1 {
-            left += 1;
-            continue;
+        match (disk[left], disk[right]) {
+            (_, -1) => right -= 1,
+            (-1, _) => {
+                disk.swap(left, right);
+                left += 1;
+                right -= 1;
+            }
+            _ => left += 1,
         }
-        if disk[right] == -1 {
-            right -= 1;
-            continue;
-        }
-        disk.swap(left, right);
-        left += 1;
-        right -= 1;
     }
     score(&disk, left)
 }
@@ -121,9 +119,7 @@ pub fn solve() {
             1 => file_id,
             _ => panic!("Invalid flag"),
         };
-        for _ in 0..num {
-            disk.push(to_push);
-        }
+        disk.extend(std::iter::repeat(to_push).take(num as usize));
         file_id += flag;
         flag = 1 - flag;
     });
