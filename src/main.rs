@@ -6,6 +6,7 @@ mod day5;
 mod day6;
 mod day7;
 mod day8;
+mod day9;
 
 use std::collections::HashMap;
 
@@ -19,6 +20,7 @@ fn main() {
         ("day6", day6::solve as fn()),
         ("day7", day7::solve as fn()),
         ("day8", day8::solve as fn()),
+        ("day9", day9::solve as fn()),
     ]);
 
     let args: Vec<String> = std::env::args().collect();
