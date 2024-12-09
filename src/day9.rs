@@ -1,5 +1,30 @@
 use std::io::{self, Read};
 
+pub fn part_one(original_disk: Vec<i64>) -> i64 {
+    let mut disk = original_disk.clone();
+    let mut left = 0;
+    let mut right = disk.len() - 1;
+    while left < right {
+        if disk[left] != -1 {
+            left += 1;
+            continue;
+        }
+        if disk[right] == -1 {
+            right -= 1;
+            continue;
+        }
+        disk.swap(left, right);
+        left += 1;
+        right -= 1;
+    }
+    let end = disk.iter().position(|&x| x == -1).unwrap();
+    disk.iter()
+        .enumerate()
+        .take(end)
+        .map(|(i, &x)| x * i as i64)
+        .sum::<i64>()
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -19,27 +44,6 @@ pub fn solve() {
         file_id += flag;
         flag = 1 - flag;
     });
-    let mut left = 0;
-    let mut right = disk.len() - 1;
-    while left < right {
-        if disk[left] != -1 {
-            left += 1;
-            continue;
-        }
-        if disk[right] == -1 {
-            right -= 1;
-            continue;
-        }
-        disk.swap(left, right);
-        left += 1;
-        right -= 1;
-    }
-    let end = disk.iter().position(|&x| x == -1).unwrap();
-    let result = disk
-        .iter()
-        .enumerate()
-        .take(end)
-        .map(|(i, &x)| x * i as i64)
-        .sum::<i64>();
-    println!("{:?}", result);
+    let part_one_result = part_one(disk);
+    println!("{}", part_one_result);
 }
