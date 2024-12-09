@@ -3,11 +3,7 @@ use std::collections::BinaryHeap;
 use std::collections::HashSet;
 use std::io::{self, Read};
 
-fn score(disk: &[i64], part_one: bool) -> i64 {
-    let mut end = disk.iter().position(|&x| x == -1).unwrap();
-    if !part_one {
-        end = disk.len();
-    }
+fn score(disk: &[i64], end: usize) -> i64 {
     disk.iter()
         .enumerate()
         .take(end)
@@ -32,7 +28,7 @@ pub fn part_one(original_disk: &Vec<i64>) -> i64 {
         left += 1;
         right -= 1;
     }
-    score(&disk, true)
+    score(&disk, left)
 }
 
 fn place_file(
@@ -109,7 +105,7 @@ pub fn part_two(original_disk: Vec<i64>) -> i64 {
             to_push.push((right, disk[right]));
         }
     }
-    score(&disk, false)
+    score(&disk, disk.len())
 }
 
 pub fn solve() {
