@@ -38,6 +38,25 @@ pub fn bfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
     result
 }
 
+pub fn dfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
+    let x = matrix[i][j];
+    if x == 9 {
+        return 1;
+    }
+    let mut result = 0;
+    for (di, dj) in DIRS4.iter() {
+        let (ni, nj) = (i as i32 + di, j as i32 + dj);
+        if ni < 0 || ni >= matrix.len() as i32 || nj < 0 || nj >= matrix[0].len() as i32 {
+            continue;
+        }
+        if matrix[ni as usize][nj as usize] - x != 1 {
+            continue;
+        }
+        result += dfs(matrix, ni as usize, nj as usize);
+    }
+    result
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -45,13 +64,16 @@ pub fn solve() {
         .lines()
         .map(|line| line.chars().map(|c| c as i8 - '0' as i8).collect())
         .collect();
-    let mut result = 0;
+    let mut result_part_one = 0;
+    let mut result_part_two = 0;
     for i in 0..matrix.len() {
         for j in 0..matrix[0].len() {
             if matrix[i][j] == 0 {
-                result += bfs(&matrix, i, j);
+                result_part_one += bfs(&matrix, i, j);
+                result_part_two += dfs(&matrix, i, j);
             }
         }
     }
-    println!("{}", result);
+    println!("{}", result_part_one);
+    println!("{}", result_part_two);
 }
