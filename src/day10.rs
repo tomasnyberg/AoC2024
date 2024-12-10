@@ -3,7 +3,7 @@ use std::{
     io::{self, Read},
 };
 
-const DIRS4: [(i32, i32); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
+const DIRS4: [(i8, i8); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 
 pub fn bfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
     let mut deque: VecDeque<(usize, usize)> = VecDeque::new();
@@ -24,8 +24,8 @@ pub fn bfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
                 continue;
             }
             for (di, dj) in DIRS4.iter() {
-                let (ni, nj) = (i as i32 + di, j as i32 + dj);
-                if ni < 0 || ni >= matrix.len() as i32 || nj < 0 || nj >= matrix[0].len() as i32 {
+                let (ni, nj) = (i as i8 + di, j as i8 + dj);
+                if ni < 0 || ni >= matrix.len() as i8 || nj < 0 || nj >= matrix[0].len() as i8 {
                     continue;
                 }
                 if matrix[ni as usize][nj as usize] - x != 1 {
@@ -38,21 +38,21 @@ pub fn bfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
     result
 }
 
-pub fn dfs(matrix: &[Vec<i8>], i: usize, j: usize) -> i32 {
-    let x = matrix[i][j];
+pub fn dfs(matrix: &[Vec<i8>], i: i8, j: i8) -> i16 {
+    let x = matrix[i as usize][j as usize];
     if x == 9 {
         return 1;
     }
     let mut result = 0;
     for (di, dj) in DIRS4.iter() {
-        let (ni, nj) = (i as i32 + di, j as i32 + dj);
-        if ni < 0 || ni >= matrix.len() as i32 || nj < 0 || nj >= matrix[0].len() as i32 {
+        let (ni, nj) = (i + di, j + dj);
+        if ni < 0 || ni >= matrix.len() as i8 || nj < 0 || nj >= matrix[0].len() as i8 {
             continue;
         }
         if matrix[ni as usize][nj as usize] - x != 1 {
             continue;
         }
-        result += dfs(matrix, ni as usize, nj as usize);
+        result += dfs(matrix, ni, nj);
     }
     result
 }
@@ -70,7 +70,7 @@ pub fn solve() {
         for j in 0..matrix[0].len() {
             if matrix[i][j] == 0 {
                 result_part_one += bfs(&matrix, i, j);
-                result_part_two += dfs(&matrix, i, j);
+                result_part_two += dfs(&matrix, i as i8, j as i8);
             }
         }
     }
