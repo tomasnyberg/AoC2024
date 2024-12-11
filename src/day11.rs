@@ -1,4 +1,7 @@
-use std::io::{self, Read};
+use std::{
+    collections::HashMap,
+    io::{self, Read},
+};
 
 pub fn digit_count(mut x: i64) -> i32 {
     let mut result = 0;
@@ -31,6 +34,18 @@ pub fn one_iter(xs: &mut Vec<i64>) {
     }
 }
 
+pub fn number_five_iters(x: i64) -> HashMap<i64, i64> {
+    let mut xs = vec![x];
+    for _ in 0..5 {
+        one_iter(&mut xs);
+    }
+    let mut result = HashMap::new();
+    for x in xs {
+        *result.entry(x).or_insert(0) += 1;
+    }
+    result
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -39,8 +54,19 @@ pub fn solve() {
         .split(' ')
         .map(|l| l.parse().unwrap())
         .collect();
-    for _ in 0..25 {
-        one_iter(&mut input);
+    let mut known_combos: HashMap<i64, HashMap<i64, i64>> = HashMap::new();
+    let mut counts: HashMap<i64, i64> = input.iter().map(|x| (*x, 1)).collect();
+    for _ in 0..(75 / 5) {
+        let mut new_counts: HashMap<i64, i64> = HashMap::new();
+        for (k, v) in &counts {
+            if !known_combos.contains_key(k) {
+                known_combos.insert(*k, number_five_iters(*k));
+            }
+            for (k2, v2) in known_combos.get(k).unwrap() {
+                *new_counts.entry(*k2).or_insert(0) += v * v2;
+            }
+        }
+        counts = new_counts;
     }
-    println!("{:?}", input.len());
+    println!("{}", counts.values().sum::<i64>());
 }
