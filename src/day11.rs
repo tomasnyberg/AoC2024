@@ -56,7 +56,7 @@ pub fn solve() {
         .collect();
     let mut known_combos: HashMap<i64, HashMap<i64, i64>> = HashMap::new();
     let mut counts: HashMap<i64, i64> = input.iter().map(|x| (*x, 1)).collect();
-    for _ in 0..(75 / 5) {
+    for iter in 0..(75 / 5) {
         let mut new_counts: HashMap<i64, i64> = HashMap::new();
         for (k, v) in &counts {
             if !known_combos.contains_key(k) {
@@ -67,6 +67,9 @@ pub fn solve() {
             }
         }
         counts = new_counts;
+        if iter == 4 {
+            println!("{}", counts.values().sum::<i64>());
+        }
     }
     println!("{}", counts.values().sum::<i64>());
 }
