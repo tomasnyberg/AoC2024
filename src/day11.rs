@@ -49,13 +49,13 @@ pub fn number_five_iters(x: i64) -> HashMap<i64, i64> {
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
-    let mut input: Vec<i64> = input
+    let stones: Vec<i64> = input
         .trim()
         .split(' ')
         .map(|l| l.parse().unwrap())
         .collect();
     let mut known_combos: HashMap<i64, HashMap<i64, i64>> = HashMap::new();
-    let mut counts: HashMap<i64, i64> = input.iter().map(|x| (*x, 1)).collect();
+    let mut counts: HashMap<i64, i64> = stones.iter().map(|x| (*x, 1)).collect();
     for iter in 0..(75 / 5) {
         let mut new_counts: HashMap<i64, i64> = HashMap::new();
         for (k, v) in &counts {
