@@ -1,4 +1,7 @@
-use std::io::{self, Read};
+use std::{
+    collections::HashSet,
+    io::{self, Read},
+};
 
 const DIRS4: [(i32, i32); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 
@@ -7,27 +10,26 @@ pub fn dfs(
     j: i32,
     expected: char,
     visited: &mut Vec<Vec<bool>>,
+    perimeter: &mut HashSet<(i32, i32, i32)>,
     grid: &Vec<Vec<char>>,
-) -> (i32, i32) {
-    if i < 0 || i >= grid.len() as i32 || j < 0 || j >= grid[0].len() as i32 {
-        return (1, 0);
-    }
-    if visited[i as usize][j as usize] {
-        return if grid[i as usize][j as usize] == expected {
-            (0, 0)
-        } else {
-            (1, 0)
-        };
-    }
-    if grid[i as usize][j as usize] != expected {
-        return (1, 0);
-    }
+) -> i32 {
     visited[i as usize][j as usize] = true;
-    let (perim, area) = DIRS4
+    1 + DIRS4
         .iter()
-        .map(|(di, dj)| dfs(i + di, j + dj, expected, visited, grid))
-        .fold((0, 0), |(a, b), (c, d)| (a + c, b + d));
-    (perim, area + 1)
+        .enumerate()
+        .map(|(idx, (di, dj))| {
+            let (ni, nj) = (i + di, j + dj);
+            let a = ni < 0 || ni >= grid.len() as i32 || nj < 0 || nj >= grid[0].len() as i32;
+            let b = !a && grid[ni as usize][nj as usize] != expected;
+            if a || b {
+                perimeter.insert((i, j, idx as i32));
+                return 0;
+            } else if !visited[ni as usize][nj as usize] {
+                return dfs(ni, nj, expected, visited, perimeter, grid);
+            }
+            0
+        })
+        .sum::<i32>()
 }
 
 pub fn solve() {
@@ -35,14 +37,22 @@ pub fn solve() {
     io::stdin().read_to_string(&mut input).unwrap();
     let lines: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
     let mut visited = vec![vec![false; lines[0].len()]; lines.len()];
-    let mut result = 0;
+    let mut result_part_one = 0;
     for i in 0..lines.len() {
         for j in 0..lines[0].len() {
             if !visited[i][j] {
-                let (perim, area) = dfs(i as i32, j as i32, lines[i][j], &mut visited, &lines);
-                result += perim * area;
+                let mut perimeter = HashSet::new();
+                let node_c = dfs(
+                    i as i32,
+                    j as i32,
+                    lines[i][j],
+                    &mut visited,
+                    &mut perimeter,
+                    &lines,
+                );
+                result_part_one += perimeter.len() as i32 * node_c;
             }
         }
     }
-    println!("{}", result);
+    println!("{}", result_part_one);
 }
