@@ -68,9 +68,9 @@ pub fn solve() {
         let (dx, dy): (i32, i32) = parse_part(parts[1]);
         robots.push((x, y, dx, dy));
     });
+    let mut seen: Vec<Vec<usize>> = vec![vec![0; m as usize]; n as usize];
     for iter in 0..10000 {
         let mut new_robots: Vec<(i32, i32, i32, i32)> = Vec::new();
-        let mut seen: Vec<Vec<bool>> = vec![vec![false; m as usize]; n as usize];
         let mut components = 0;
         for &(x, y, dx, dy) in robots.iter() {
             let (mut nx, mut ny) = (x + dx, y + dy);
@@ -83,10 +83,12 @@ pub fn solve() {
             nx %= m;
             ny %= n;
             new_robots.push((nx, ny, dx, dy));
-            if seen[ny as usize][nx as usize] {
+            if iter != 0 {
+                seen[y as usize][x as usize] -= 1;
+            }
+            seen[ny as usize][nx as usize] += 1;
+            if seen[ny as usize][nx as usize] != 1 {
                 continue;
-            } else {
-                seen[ny as usize][nx as usize] = true;
             }
             let mut new_c = 1;
             for &(dx, dy) in DIRS8.iter() {
@@ -94,7 +96,7 @@ pub fn solve() {
                 if ni < 0 || ni >= m || nj < 0 || nj >= n {
                     continue;
                 }
-                if seen[nj as usize][ni as usize] {
+                if seen[nj as usize][ni as usize] != 0 {
                     new_c = 0;
                     break;
                 }
@@ -105,7 +107,7 @@ pub fn solve() {
         if iter == 99 {
             println!("{}", score(&robots, n, m));
         }
-        if components < 250 {
+        if components < 200 {
             println!("{}", iter + 1);
             break;
         }
