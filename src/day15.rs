@@ -1,4 +1,7 @@
-use std::io::{self, Read};
+use std::{
+    collections::{HashMap, VecDeque},
+    io::{self, Read},
+};
 
 const MOVE_CHARS: [char; 4] = ['^', '>', 'v', '<'];
 const MOVE_VECTORS: [(i32, i32); 4] = [(-1, 0), (0, 1), (1, 0), (0, -1)];
@@ -16,7 +19,7 @@ fn score(matrix: &[Vec<char>]) -> i32 {
     let mut score = 0;
     (0..matrix.len()).for_each(|i| {
         for j in 0..matrix[i].len() {
-            if matrix[i][j] == 'O' {
+            if matrix[i][j] == 'O' || matrix[i][j] == '[' {
                 score += (i as i32 * 100) + j as i32;
             }
         }
@@ -51,7 +54,6 @@ fn make_big_matrix(matrix: &[Vec<char>]) -> Vec<Vec<char>> {
             }
         }
     }
-    _debug_print(&big_matrix);
     big_matrix
 }
 
@@ -90,45 +92,83 @@ fn part_one(matrix: &[Vec<char>], moves: &str) -> i32 {
     score(&matrix)
 }
 
+fn move_vertical(matrix: &mut [Vec<char>], i: i32, j: i32, dir: i32) -> bool {
+    let mut seen: HashMap<(i32, i32), char> = HashMap::new();
+    let mut q: VecDeque<(i32, i32)> = VecDeque::new();
+    q.push_back((i, j));
+    while !q.is_empty() {
+        let (i, j) = q.pop_front().unwrap();
+        if matrix[i as usize][j as usize] == '#' {
+            seen.clear();
+            break;
+        }
+        if matrix[i as usize][j as usize] == '.' {
+            continue;
+        }
+        if seen.contains_key(&(i, j)) {
+            continue;
+        }
+        seen.insert((i, j), matrix[i as usize][j as usize]);
+        if matrix[i as usize][j as usize] == '[' {
+            q.push_back((i, j + 1));
+        }
+        if matrix[i as usize][j as usize] == ']' {
+            q.push_back((i, j - 1));
+        }
+        q.push_back((i + dir, j));
+    }
+    for (i, j) in seen.keys() {
+        matrix[*i as usize][*j as usize] = '.';
+    }
+    for (i, j) in seen.keys() {
+        matrix[(*i + dir) as usize][*j as usize] = seen[&(*i, *j)];
+    }
+    !seen.is_empty()
+}
+
 fn part_two(matrix: &[Vec<char>], moves: &str) -> i32 {
     let (mut i, mut j) = find_start(matrix);
     let mut matrix: Vec<Vec<char>> = matrix.to_vec();
-    println!("size: {} {}", matrix.len(), matrix[0].len());
-    println!("i j: {} {}", i, j);
     for c in moves.chars() {
         let idx = MOVE_CHARS.iter().position(|&x| x == c).unwrap();
         let (di, dj) = MOVE_VECTORS[idx];
         let (mut ni, mut nj) = (i, j);
-        let mut to_move: Vec<char> = vec!['@'];
-        loop {
-            ni += di;
-            nj += dj;
-            if matrix[ni as usize][nj as usize] == '#' {
-                to_move.clear();
-                break;
-            }
-            if matrix[ni as usize][nj as usize] == '.' {
-                break;
-            }
-            to_move.push(matrix[ni as usize][nj as usize]);
-            ni += di;
-            nj += dj;
-            to_move.push(matrix[ni as usize][nj as usize]);
-        }
-        if !to_move.is_empty() {
-            ni = i;
-            nj = j;
-            matrix[i as usize][j as usize] = '.';
-            i += di;
-            j += dj;
-            for c in to_move {
+        if idx == 1 || idx == 3 {
+            let mut to_move: Vec<char> = vec!['@'];
+            loop {
                 ni += di;
                 nj += dj;
-                matrix[ni as usize][nj as usize] = c;
+                if matrix[ni as usize][nj as usize] == '#' {
+                    to_move.clear();
+                    break;
+                }
+                if matrix[ni as usize][nj as usize] == '.' {
+                    break;
+                }
+                to_move.push(matrix[ni as usize][nj as usize]);
+                ni += di;
+                nj += dj;
+                to_move.push(matrix[ni as usize][nj as usize]);
+            }
+            if !to_move.is_empty() {
+                ni = i;
+                nj = j;
+                matrix[i as usize][j as usize] = '.';
+                i += di;
+                j += dj;
+                for c in to_move {
+                    ni += di;
+                    nj += dj;
+                    matrix[ni as usize][nj as usize] = c;
+                }
+            }
+        } else {
+            assert!(di != 0 && dj == 0);
+            let moved = move_vertical(&mut matrix, i, j, di);
+            if moved {
+                i += di;
             }
         }
-        println!("move: {}", c);
-        _debug_print(&matrix);
     }
     score(&matrix)
 }
@@ -149,4 +189,5 @@ pub fn solve() {
     let p2matrix = make_big_matrix(&matrix);
     let part_two = part_two(&p2matrix, &moves);
     println!("{}", part_one);
+    println!("{}", part_two);
 }
