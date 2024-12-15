@@ -35,6 +35,26 @@ fn find_start(matrix: &[Vec<char>]) -> (i32, i32) {
     (0, 0)
 }
 
+fn make_big_matrix(matrix: &[Vec<char>]) -> Vec<Vec<char>> {
+    let mut big_matrix: Vec<Vec<char>> = vec![vec!['.'; matrix[0].len() * 2]; matrix.len()];
+    for (i, row) in matrix.iter().enumerate() {
+        for (j, &c) in row.iter().enumerate() {
+            if c == 'O' {
+                big_matrix[i][j * 2] = '[';
+                big_matrix[i][j * 2 + 1] = ']';
+                continue;
+            }
+            big_matrix[i][j * 2] = c;
+            big_matrix[i][j * 2 + 1] = c;
+            if c == '@' {
+                big_matrix[i][j * 2 + 1] = '.';
+            }
+        }
+    }
+    _debug_print(&big_matrix);
+    big_matrix
+}
+
 fn part_one(matrix: &[Vec<char>], moves: &str) -> i32 {
     let (mut i, mut j) = find_start(matrix);
     let mut matrix: Vec<Vec<char>> = matrix.to_vec();
@@ -83,5 +103,6 @@ pub fn solve() {
     let moves = parts.next().unwrap();
     let moves = moves.replace('\n', "");
     let part_one = part_one(&matrix, &moves);
+    let p2matrix = make_big_matrix(&matrix);
     println!("{}", part_one);
 }
