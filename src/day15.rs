@@ -12,6 +12,18 @@ fn _debug_print(matrix: &Vec<Vec<char>>) {
     }
 }
 
+fn score(matrix: &[Vec<char>]) -> i32 {
+    let mut score = 0;
+    (0..matrix.len()).for_each(|i| {
+        for j in 0..matrix[i].len() {
+            if matrix[i][j] == 'O' {
+                score += (i as i32 * 100) + j as i32;
+            }
+        }
+    });
+    score
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -63,8 +75,6 @@ pub fn solve() {
             i += di;
             j += dj;
         }
-        println!("Move: {}", c);
-        println!("To move: {:?}", to_move);
-        _debug_print(&matrix);
     }
+    println!("{}", score(&matrix));
 }
