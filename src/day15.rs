@@ -28,7 +28,7 @@ fn find_start(matrix: &[Vec<char>]) -> (i32, i32) {
     for (y, row) in matrix.iter().enumerate() {
         for (x, &c) in row.iter().enumerate() {
             if c == '@' {
-                return (x as i32, y as i32);
+                return (y as i32, x as i32);
             }
         }
     }
@@ -90,6 +90,49 @@ fn part_one(matrix: &[Vec<char>], moves: &str) -> i32 {
     score(&matrix)
 }
 
+fn part_two(matrix: &[Vec<char>], moves: &str) -> i32 {
+    let (mut i, mut j) = find_start(matrix);
+    let mut matrix: Vec<Vec<char>> = matrix.to_vec();
+    println!("size: {} {}", matrix.len(), matrix[0].len());
+    println!("i j: {} {}", i, j);
+    for c in moves.chars() {
+        let idx = MOVE_CHARS.iter().position(|&x| x == c).unwrap();
+        let (di, dj) = MOVE_VECTORS[idx];
+        let (mut ni, mut nj) = (i, j);
+        let mut to_move: Vec<char> = vec!['@'];
+        loop {
+            ni += di;
+            nj += dj;
+            if matrix[ni as usize][nj as usize] == '#' {
+                to_move.clear();
+                break;
+            }
+            if matrix[ni as usize][nj as usize] == '.' {
+                break;
+            }
+            to_move.push(matrix[ni as usize][nj as usize]);
+            ni += di;
+            nj += dj;
+            to_move.push(matrix[ni as usize][nj as usize]);
+        }
+        if !to_move.is_empty() {
+            ni = i;
+            nj = j;
+            matrix[i as usize][j as usize] = '.';
+            i += di;
+            j += dj;
+            for c in to_move {
+                ni += di;
+                nj += dj;
+                matrix[ni as usize][nj as usize] = c;
+            }
+        }
+        println!("move: {}", c);
+        _debug_print(&matrix);
+    }
+    score(&matrix)
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -104,5 +147,6 @@ pub fn solve() {
     let moves = moves.replace('\n', "");
     let part_one = part_one(&matrix, &moves);
     let p2matrix = make_big_matrix(&matrix);
+    let part_two = part_two(&p2matrix, &moves);
     println!("{}", part_one);
 }
