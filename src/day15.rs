@@ -24,29 +24,20 @@ fn score(matrix: &[Vec<char>]) -> i32 {
     score
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
-    let mut parts = input.split("\n\n");
-    let mut matrix: Vec<Vec<char>> = parts
-        .next()
-        .unwrap()
-        .lines()
-        .map(|line| line.chars().collect())
-        .collect();
-    let moves = parts.next().unwrap();
-    let moves = moves.replace('\n', "");
-    let mut i = 0;
-    let mut j = 0;
+fn find_start(matrix: &[Vec<char>]) -> (i32, i32) {
     for (y, row) in matrix.iter().enumerate() {
         for (x, &c) in row.iter().enumerate() {
             if c == '@' {
-                i = x as i32;
-                j = y as i32;
-                break;
+                return (x as i32, y as i32);
             }
         }
     }
+    (0, 0)
+}
+
+fn part_one(matrix: &[Vec<char>], moves: &str) -> i32 {
+    let (mut i, mut j) = find_start(matrix);
+    let mut matrix: Vec<Vec<char>> = matrix.to_vec();
     for c in moves.chars() {
         let idx = MOVE_CHARS.iter().position(|&x| x == c).unwrap();
         let (di, dj) = MOVE_VECTORS[idx];
@@ -76,5 +67,21 @@ pub fn solve() {
             j += dj;
         }
     }
-    println!("{}", score(&matrix));
+    score(&matrix)
+}
+
+pub fn solve() {
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap();
+    let mut parts = input.split("\n\n");
+    let matrix: Vec<Vec<char>> = parts
+        .next()
+        .unwrap()
+        .lines()
+        .map(|line| line.chars().collect())
+        .collect();
+    let moves = parts.next().unwrap();
+    let moves = moves.replace('\n', "");
+    let part_one = part_one(&matrix, &moves);
+    println!("{}", part_one);
 }
