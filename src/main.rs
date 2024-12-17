@@ -6,6 +6,7 @@ mod day13;
 mod day14;
 mod day15;
 mod day16;
+mod day17;
 mod day2;
 mod day3;
 mod day4;
@@ -35,6 +36,7 @@ fn main() {
         ("day14", day14::solve as fn()),
         ("day15", day15::solve as fn()),
         ("day16", day16::solve as fn()),
+        ("day17", day17::solve as fn()),
     ]);
 
     let args: Vec<String> = std::env::args().collect();
