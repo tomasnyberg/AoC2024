@@ -8,11 +8,23 @@ use std::io::{self, Read};
 // 5 = out, calculate combo operand mod 8 and output it
 // 6 = bdv, adv, but store to B instead of A
 // 7 = cdv, adv, but store to C instead of A
+//
+
+/*
+* 2 4 - B = A % 8
+* 1 3 - B ^= 3
+* 7 5 - C = A / 2^C
+* 0 3 - A = A / 2^3
+* 1 5 - B ^= 5
+* 4 4 - B ^= C
+* 5 5 - output B % 8
+* 3 0 - if A != 0 jump to 0
+*/
 
 const MAPPED: [&str; 8] = ["adv", "bxl", "bst", "jnz", "bxc", "out", "bdv", "cdv"];
 
 // outputs (printed value, i) where printed value is -1 if nothing printed
-fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]) -> (i32, usize) {
+fn execute_instruction(mut i: usize, instructions: &[i64], registers: &mut [i64]) -> (i64, usize) {
     let mut output = -1;
     let (op, operand) = (instructions[i], instructions[i + 1]);
     let combo = match operand {
@@ -22,7 +34,7 @@ fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]
         _ => operand,
     };
     match op {
-        0 => registers[0] /= 2_i32.pow(combo as u32),
+        0 => registers[0] /= 2_i64.pow(combo as u32),
         1 => registers[1] ^= operand,
         2 => registers[1] = combo % 8,
         3 => {
@@ -32,8 +44,8 @@ fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]
         }
         4 => registers[1] ^= registers[2],
         5 => output = combo % 8,
-        6 => registers[1] = registers[0] / 2_i32.pow(combo as u32),
-        7 => registers[2] = registers[0] / 2_i32.pow(combo as u32),
+        6 => registers[1] = registers[0] / 2_i64.pow(combo as u32),
+        7 => registers[2] = registers[0] / 2_i64.pow(combo as u32),
         _ => (),
     }
     if op != 3 || registers[0] == 0 {
@@ -42,7 +54,7 @@ fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]
     (output, i)
 }
 
-fn part_one(instructions: &[i32], original_registers: &[i32]) -> String {
+fn part_one(instructions: &[i64], original_registers: &[i64]) -> String {
     let mut registers = original_registers.to_vec();
     let mut i = 0;
     let mut result = Vec::new();
@@ -64,13 +76,13 @@ pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let mut parts = input.split("\n\n");
-    let registers: Vec<i32> = parts
+    let registers: Vec<i64> = parts
         .next()
         .unwrap()
         .lines()
-        .map(|l| l.split(": ").nth(1).unwrap().parse::<i32>().unwrap())
+        .map(|l| l.split(": ").nth(1).unwrap().parse::<i64>().unwrap())
         .collect();
-    let instructions: Vec<i32> = parts
+    let instructions: Vec<i64> = parts
         .next()
         .unwrap()
         .split(": ")
@@ -78,7 +90,7 @@ pub fn solve() {
         .unwrap()
         .trim()
         .split(',')
-        .map(|i| i.parse::<i32>().unwrap())
+        .map(|i| i.parse::<i64>().unwrap())
         .collect();
     let part_one = part_one(&instructions, &registers);
     println!("{}", part_one);
