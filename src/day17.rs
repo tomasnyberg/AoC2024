@@ -11,6 +11,37 @@ use std::io::{self, Read};
 
 const MAPPED: [&str; 8] = ["adv", "bxl", "bst", "jnz", "bxc", "out", "bdv", "cdv"];
 
+// outputs (printed value, i) where printed value is -1 if nothing printed
+fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]) -> (i32, usize) {
+    let mut output = -1;
+    let (op, operand) = (instructions[i], instructions[i + 1]);
+    let combo = match operand {
+        4 => registers[0],
+        5 => registers[1],
+        6 => registers[2],
+        _ => operand,
+    };
+    match op {
+        0 => registers[0] /= 2_i32.pow(combo as u32),
+        1 => registers[1] ^= operand,
+        2 => registers[1] = combo % 8,
+        3 => {
+            if registers[0] != 0 {
+                i = operand as usize;
+            }
+        }
+        4 => registers[1] ^= registers[2],
+        5 => output = combo % 8,
+        6 => registers[1] = registers[0] / 2_i32.pow(combo as u32),
+        7 => registers[2] = registers[0] / 2_i32.pow(combo as u32),
+        _ => (),
+    }
+    if op != 3 || registers[0] == 0 {
+        return (output, i + 2);
+    }
+    (output, i)
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
@@ -34,31 +65,11 @@ pub fn solve() {
     let mut i = 0;
     let mut result: Vec<i32> = Vec::new();
     while i < instructions.len() {
-        let (op, operand) = (instructions[i], instructions[i + 1]);
-        let combo = match operand {
-            4 => registers[0],
-            5 => registers[1],
-            6 => registers[2],
-            _ => operand,
-        };
-        match op {
-            0 => registers[0] /= 2_i32.pow(combo as u32),
-            1 => registers[1] ^= operand,
-            2 => registers[1] = combo % 8,
-            3 => {
-                if registers[0] != 0 {
-                    i = operand as usize;
-                }
-            }
-            4 => registers[1] ^= registers[2],
-            5 => result.push(combo % 8),
-            6 => registers[1] = registers[0] / 2_i32.pow(combo as u32),
-            7 => registers[2] = registers[0] / 2_i32.pow(combo as u32),
-            _ => (),
+        let (output, new_i) = execute_instruction(i, &instructions, &mut registers);
+        if output != -1 {
+            result.push(output);
         }
-        if op != 3 || registers[0] == 0 {
-            i += 2;
-        }
+        i = new_i;
     }
     println!(
         "{}",
