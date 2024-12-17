@@ -42,11 +42,29 @@ fn execute_instruction(mut i: usize, instructions: &[i32], registers: &mut [i32]
     (output, i)
 }
 
+fn part_one(instructions: &[i32], original_registers: &[i32]) -> String {
+    let mut registers = original_registers.to_vec();
+    let mut i = 0;
+    let mut result = Vec::new();
+    while i < instructions.len() {
+        let (output, new_i) = execute_instruction(i, instructions, &mut registers);
+        if output != -1 {
+            result.push(output);
+        }
+        i = new_i;
+    }
+    result
+        .iter()
+        .map(|r| r.to_string())
+        .collect::<Vec<String>>()
+        .join(",")
+}
+
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let mut parts = input.split("\n\n");
-    let mut registers: Vec<i32> = parts
+    let registers: Vec<i32> = parts
         .next()
         .unwrap()
         .lines()
@@ -62,21 +80,6 @@ pub fn solve() {
         .split(',')
         .map(|i| i.parse::<i32>().unwrap())
         .collect();
-    let mut i = 0;
-    let mut result: Vec<i32> = Vec::new();
-    while i < instructions.len() {
-        let (output, new_i) = execute_instruction(i, &instructions, &mut registers);
-        if output != -1 {
-            result.push(output);
-        }
-        i = new_i;
-    }
-    println!(
-        "{}",
-        result
-            .iter()
-            .map(|r| r.to_string())
-            .collect::<Vec<String>>()
-            .join(",")
-    );
+    let part_one = part_one(&instructions, &registers);
+    println!("{}", part_one);
 }
