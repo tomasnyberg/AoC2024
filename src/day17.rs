@@ -8,35 +8,6 @@ use std::io::{self, Read};
 // 5 = out, calculate combo operand mod 8 and output it
 // 6 = bdv, adv, but store to B instead of A
 // 7 = cdv, adv, but store to C instead of A
-//
-
-/*
-* 2 4 - B = A % 8
-* 1 3 - B ^= 3
-* 7 5 - C = A / 2^B
-* 0 3 - A = A / 2^3
-* 1 5 - B ^= 5
-* 4 4 - B ^= C
-* 5 5 - output B % 8
-* 3 0 - if A != 0 jump to 0
-*/
-
-// A == 0 <- not possible since then we would have quit on the last round
-// A == 1 <- doesn't work
-//
-
-const MAPPED: [&str; 8] = ["adv", "bxl", "bst", "jnz", "bxc", "out", "bdv", "cdv"];
-// based on the first 8 comments
-const EXPLAINED: [&str; 8] = [
-    "Store A/2^combo to A; ",
-    "B ^= literal; ",
-    "B = combo % 8; ",
-    "Jump to literal if A != 0; ",
-    "B ^= C (ignore operand); ",
-    "Output combo % 8; ",
-    "Store A/2^combo to B; ",
-    "Store A/2^combo to C; ",
-];
 
 // outputs (printed value, i) where printed value is -1 if nothing printed
 fn execute_instruction(mut i: usize, instructions: &[i64], registers: &mut [i64]) -> (i64, usize) {
@@ -48,11 +19,6 @@ fn execute_instruction(mut i: usize, instructions: &[i64], registers: &mut [i64]
         6 => registers[2],
         _ => operand,
     };
-    //println!("registers {:?}", registers);
-    //println!(
-    //    "{} combo {} literal {}",
-    //    EXPLAINED[op as usize], combo, operand
-    //);
     match op {
         0 => registers[0] /= 2_i64.pow(combo as u32),
         1 => registers[1] ^= operand,
@@ -92,33 +58,10 @@ fn part_one(instructions: &[i64], original_registers: &[i64]) -> String {
         .join(",")
 }
 
-fn brute_force(instructions: &[i64]) -> i64 {
-    let mut best_correct = 0;
-    let mut prev_a = 0;
-    for div_by in 1..1000 {
-        let start = 8_i64.pow(15) + ((8_i64.pow(16) - 8_i64.pow(15)) / div_by * div_by);
-        let mut i = 0;
-        let mut registers = vec![start, 0, 0];
-        let mut correct_idx = 0;
-        let mut seen: Vec<i64> = Vec::new();
-        while i < instructions.len() {
-            let (output, new_i) = execute_instruction(i, instructions, &mut registers);
-            if output != -1 {
-                seen.push(output);
-            }
-            i = new_i;
-        }
-        println!("start: {}", start);
-        println!("seen: {:?} len {}", seen, seen.len());
-    }
-    -1
-}
-
 fn try_combo(a: i64, target: i64) -> bool {
     let mut b = a % 8;
     b ^= 3;
     let c = a / 2_i64.pow(b.try_into().unwrap());
-    //a /= 2_i64.pow(3);
     b ^= 5;
     b ^= c;
     let output = b % 8;
@@ -147,7 +90,7 @@ pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let mut parts = input.split("\n\n");
-    let mut registers: Vec<i64> = parts
+    let registers: Vec<i64> = parts
         .next()
         .unwrap()
         .lines()
@@ -163,28 +106,10 @@ pub fn solve() {
         .split(',')
         .map(|i| i.parse::<i64>().unwrap())
         .collect();
-    println!("Part one: {}", part_one(&instructions, &registers));
-    let mut idx = instructions.len() - 1;
-    let mut curr_a: i64 = 0;
-    println!("dfs result: {}", dfs(idx as i64, &instructions, curr_a));
-    //while idx > 0 {
-    //    let expected = instructions[idx];
-    //    for i in 0..8 {
-    //        let start = curr_a + i;
-    //        if try_combo(start, expected) {
-    //            println!("found next at {} {}", start, i);
-    //            curr_a += i;
-    //            curr_a *= 8;
-    //            idx -= 1;
-    //            println!("a is now {} idx is now {}", curr_a, idx);
-    //            break;
-    //        }
-    //    }
-    //}
-    //for i in 0..8 {
-    //    let start = 6 * 8 + i;
-    //    println!("try_combo {} {}", i, try_combo(start, 3));
-    //}
-    //println!("Amount of instructions: {}", instructions.len());
-    //brute_force(&instructions);
+    let idx = instructions.len() - 1;
+    let curr_a: i64 = 0;
+    let part_one_result = part_one(&instructions, &registers);
+    let part_two_result = dfs(idx as i64, &instructions, curr_a);
+    println!("{}", part_one_result);
+    println!("{}", part_two_result);
 }
