@@ -52,15 +52,25 @@ pub fn solve() {
         bytes.push(tuple);
     });
     let mut grid = vec![vec![0; n]; n];
-    for idx in 0..bytes.len() {
-        let (i, j) = bytes[idx];
-        grid[i as usize][j as usize] = 1;
-        if (n == 7 && idx == 11) || (n == 71 && idx == 1023) {
-            println!("{}", bfs(&grid, n));
-        }
-        if idx > 1023 && bfs(&grid, n) == 0 {
-            println!("{},{}", i, j);
-            break;
+    let end = if n == 7 { 12 } else { 1024 };
+    bytes.iter().take(end).for_each(|(i, j)| {
+        grid[*i as usize][*j as usize] = 1;
+    });
+    println!("{}", bfs(&grid, n));
+    let mut low = 1024;
+    let mut high = bytes.len() as i32;
+    while low < high {
+        let mid = low + (high - low) / 2;
+        let mut new_grid = grid.clone();
+        bytes.iter().take(mid as usize).for_each(|(i, j)| {
+            new_grid[*i as usize][*j as usize] = 1;
+        });
+        if bfs(&new_grid, n) == 0 {
+            high = mid;
+        } else {
+            low = mid + 1;
         }
     }
+    let (a, b) = bytes[low as usize - 1];
+    println!("{},{}", a, b);
 }
