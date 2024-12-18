@@ -52,9 +52,15 @@ pub fn solve() {
         bytes.push(tuple);
     });
     let mut grid = vec![vec![0; n]; n];
-    let end = if n == 7 { 12 } else { 1024 };
-    bytes.iter().take(end).for_each(|(i, j)| {
-        grid[*i as usize][*j as usize] = 1;
-    });
-    println!("{}", bfs(&grid, n));
+    for idx in 0..bytes.len() {
+        let (i, j) = bytes[idx];
+        grid[i as usize][j as usize] = 1;
+        if (n == 7 && idx == 11) || (n == 71 && idx == 1023) {
+            println!("{}", bfs(&grid, n));
+        }
+        if idx > 1023 && bfs(&grid, n) == 0 {
+            println!("{},{}", i, j);
+            break;
+        }
+    }
 }
