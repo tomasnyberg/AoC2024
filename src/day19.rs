@@ -70,12 +70,15 @@ pub fn solve() {
     for pattern in patterns {
         insert(&mut root, pattern);
     }
-    let mut result = 0;
+    let mut part_one = 0;
+    let mut part_two = 0;
     let mut seen = HashMap::new();
     for target in targets {
         let add = search(&root, &root, &target, 0, &mut seen);
-        result += add;
+        part_one += if add > 0 { 1 } else { 0 };
+        part_two += add;
         seen.clear();
     }
-    println!("{}", result);
+    println!("{}", part_one);
+    println!("{}", part_two);
 }
