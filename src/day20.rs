@@ -40,22 +40,20 @@ pub fn find_cheats(
 pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
     let mut from_start: HashMap<(usize, usize), i32> = HashMap::new();
     let mut from_end: HashMap<(usize, usize), i32> = HashMap::new();
+    let n = grid.len() as i32;
+    let m = grid[0].len() as i32;
     for iter in 0..2 {
         let mut steps = 0;
         let mut queue = VecDeque::new();
-        if iter == 0 {
-            queue.push_back((s.i, s.j));
-        } else {
-            queue.push_back((e.i, e.j));
-        }
+        queue.push_back(if iter == 0 { (s.i, s.j) } else { (e.i, e.j) });
         let map = if iter == 0 {
             &mut from_start
         } else {
             &mut from_end
         };
         while !queue.is_empty() {
-            let n = queue.len();
-            for _ in 0..n {
+            let qlen = queue.len();
+            for _ in 0..qlen {
                 let (i, j) = queue.pop_front().unwrap();
                 if map.contains_key(&(i, j)) {
                     continue;
@@ -63,10 +61,8 @@ pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
                 map.insert((i, j), steps);
                 for (di, dj) in DIRS4.iter() {
                     let (ni, nj) = (i as i32 + di, j as i32 + dj);
-                    if ni >= 0
-                        && ni < grid.len() as i32
-                        && nj >= 0
-                        && nj < grid[0].len() as i32
+                    if (0..n).contains(&ni)
+                        && (0..m).contains(&nj)
                         && grid[ni as usize][nj as usize] != '#'
                     {
                         queue.push_back((ni as usize, nj as usize));
@@ -76,8 +72,8 @@ pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
             steps += 1;
         }
     }
-    let part_one = find_cheats(&from_start, &from_end, e, grid.len() as i32, 2);
-    let part_two = find_cheats(&from_start, &from_end, e, grid.len() as i32, 20);
+    let part_one = find_cheats(&from_start, &from_end, e, n, 2);
+    let part_two = find_cheats(&from_start, &from_end, e, n, 20);
     (part_one, part_two)
 }
 
