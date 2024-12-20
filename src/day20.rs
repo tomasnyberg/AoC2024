@@ -22,15 +22,20 @@ pub fn find_cheats(
     let mut result = 0;
     for (i, j) in from_start.keys() {
         let steps = from_start[&(*i, *j)];
-        for (oi, oj) in from_end.keys() {
-            let d = (*oi as i32 - *i as i32).abs() + (*oj as i32 - *j as i32).abs();
-            if d > skips_allowed {
-                continue;
-            }
-            let total = steps + from_end[&(*oi, *oj)] + d;
-            let saved = end_steps - total;
-            if saved >= threshold {
-                result += 1;
+        for di in -20..21_i32 {
+            for dj in (di.abs() - 20)..(21 - di.abs()) {
+                let (oi, oj) = (*i as i32 + di, *j as i32 + dj);
+                if from_end.contains_key(&(oi as usize, oj as usize)) {
+                    let d = di.abs() + dj.abs();
+                    if d > skips_allowed {
+                        continue;
+                    }
+                    let total = steps + from_end[&(oi as usize, oj as usize)] + d;
+                    let saved = end_steps - total;
+                    if saved >= threshold {
+                        result += 1;
+                    }
+                }
             }
         }
     }
