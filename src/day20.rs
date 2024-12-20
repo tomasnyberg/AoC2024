@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, HashSet, VecDeque},
+    collections::{HashMap, VecDeque},
     io::{self, Read},
 };
 
@@ -15,7 +15,6 @@ pub fn find_cheats(
     from_end: &HashMap<(usize, usize), i32>,
     e: &Pos,
     n: i32,
-    m: i32,
     skips_allowed: i32,
 ) -> i32 {
     let end_steps = from_start[&(e.i, e.j)];
@@ -23,33 +22,16 @@ pub fn find_cheats(
     let mut result = 0;
     for (i, j) in from_start.keys() {
         let steps = from_start[&(*i, *j)];
-        let mut seen: HashSet<(usize, usize)> = HashSet::new();
-        let mut q = VecDeque::new();
-        q.push_back((*i, *j));
-        let mut additional = 0;
-        while additional <= skips_allowed {
-            let qlen = q.len();
-            for _ in 0..qlen {
-                let (oi, oj) = q.pop_front().unwrap();
-                if seen.contains(&(oi, oj)) {
-                    continue;
-                }
-                if from_end.contains_key(&(oi, oj)) {
-                    let total = steps + additional + from_end[&(oi, oj)];
-                    let saved = end_steps - total;
-                    if saved >= threshold {
-                        result += 1;
-                    }
-                }
-                seen.insert((oi, oj));
-                for (di, dj) in DIRS4.iter() {
-                    let (ni, nj) = (oi as i32 + di, oj as i32 + dj);
-                    if (0..n).contains(&ni) && (0..m).contains(&nj) {
-                        q.push_back((ni as usize, nj as usize));
-                    }
-                }
+        for (oi, oj) in from_end.keys() {
+            let d = (*oi as i32 - *i as i32).abs() + (*oj as i32 - *j as i32).abs();
+            if d > skips_allowed {
+                continue;
             }
-            additional += 1;
+            let total = steps + from_end[&(*oi, *oj)] + d;
+            let saved = end_steps - total;
+            if saved >= threshold {
+                result += 1;
+            }
         }
     }
     result
@@ -94,22 +76,8 @@ pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
             steps += 1;
         }
     }
-    let part_one = find_cheats(
-        &from_start,
-        &from_end,
-        e,
-        grid.len() as i32,
-        grid[0].len() as i32,
-        2,
-    );
-    let part_two = find_cheats(
-        &from_start,
-        &from_end,
-        e,
-        grid.len() as i32,
-        grid[0].len() as i32,
-        20,
-    );
+    let part_one = find_cheats(&from_start, &from_end, e, grid.len() as i32, 2);
+    let part_two = find_cheats(&from_start, &from_end, e, grid.len() as i32, 20);
     (part_one, part_two)
 }
 
