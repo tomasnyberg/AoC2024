@@ -1,3 +1,4 @@
+use rayon::prelude::*;
 use std::{
     collections::{HashMap, VecDeque},
     io::{self, Read},
@@ -19,27 +20,30 @@ pub fn find_cheats(
 ) -> i32 {
     let end_steps = from_start[&(e.i, e.j)];
     let threshold = if n > 50 { 100 } else { 50 };
-    let mut result = 0;
-    for (i, j) in from_start.keys() {
-        let steps = from_start[&(*i, *j)];
-        for di in -20..21_i32 {
-            for dj in (di.abs() - 20)..(21 - di.abs()) {
-                let (oi, oj) = (*i as i32 + di, *j as i32 + dj);
-                if from_end.contains_key(&(oi as usize, oj as usize)) {
-                    let d = di.abs() + dj.abs();
-                    if d > skips_allowed {
-                        continue;
-                    }
-                    let total = steps + from_end[&(oi as usize, oj as usize)] + d;
-                    let saved = end_steps - total;
-                    if saved >= threshold {
-                        result += 1;
+    from_start
+        .par_iter()
+        .map(|(&(i, j), &_v)| {
+            let mut local_result = 0;
+            let steps = from_start[&(i, j)];
+            for di in -20..21_i32 {
+                for dj in (di.abs() - 20)..(21 - di.abs()) {
+                    let (oi, oj) = (i as i32 + di, j as i32 + dj);
+                    if from_end.contains_key(&(oi as usize, oj as usize)) {
+                        let d = di.abs() + dj.abs();
+                        if d > skips_allowed {
+                            continue;
+                        }
+                        let total = steps + from_end[&(oi as usize, oj as usize)] + d;
+                        let saved = end_steps - total;
+                        if saved >= threshold {
+                            local_result += 1;
+                        }
                     }
                 }
             }
-        }
-    }
-    result
+            local_result
+        })
+        .sum()
 }
 
 pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
