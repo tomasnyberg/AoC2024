@@ -11,14 +11,15 @@ pub struct Pos {
 }
 
 pub fn find_cheats(
-    from_start: HashMap<(usize, usize), i32>,
-    from_end: HashMap<(usize, usize), i32>,
+    from_start: &HashMap<(usize, usize), i32>,
+    from_end: &HashMap<(usize, usize), i32>,
     e: &Pos,
     n: i32,
     m: i32,
+    skips_allowed: i32,
 ) -> i32 {
     let end_steps = from_start[&(e.i, e.j)];
-    println!("{}", end_steps);
+    let threshold = if n > 50 { 100 } else { 50 };
     let mut result = 0;
     for (i, j) in from_start.keys() {
         let steps = from_start[&(*i, *j)];
@@ -26,7 +27,7 @@ pub fn find_cheats(
         let mut q = VecDeque::new();
         q.push_back((*i, *j));
         let mut additional = 0;
-        while additional <= 20 {
+        while additional <= skips_allowed {
             let qlen = q.len();
             for _ in 0..qlen {
                 let (oi, oj) = q.pop_front().unwrap();
@@ -36,7 +37,7 @@ pub fn find_cheats(
                 if from_end.contains_key(&(oi, oj)) {
                     let total = steps + additional + from_end[&(oi, oj)];
                     let saved = end_steps - total;
-                    if saved >= 100 {
+                    if saved >= threshold {
                         result += 1;
                     }
                 }
@@ -54,7 +55,7 @@ pub fn find_cheats(
     result
 }
 
-pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> i32 {
+pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
     let mut from_start: HashMap<(usize, usize), i32> = HashMap::new();
     let mut from_end: HashMap<(usize, usize), i32> = HashMap::new();
     for iter in 0..2 {
@@ -93,13 +94,23 @@ pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> i32 {
             steps += 1;
         }
     }
-    find_cheats(
-        from_start,
-        from_end,
+    let part_one = find_cheats(
+        &from_start,
+        &from_end,
         e,
         grid.len() as i32,
         grid[0].len() as i32,
-    )
+        2,
+    );
+    let part_two = find_cheats(
+        &from_start,
+        &from_end,
+        e,
+        grid.len() as i32,
+        grid[0].len() as i32,
+        20,
+    );
+    (part_one, part_two)
 }
 
 pub fn solve() {
@@ -120,6 +131,7 @@ pub fn solve() {
     });
     let s = Pos { i: i_s, j: j_s };
     let e = Pos { i: i_e, j: j_e };
-    let res = bfs(&grid, &s, &e);
-    println!("{}", res);
+    let (part_one, part_two) = bfs(&grid, &s, &e);
+    println!("{}", part_one);
+    println!("{}", part_two);
 }
