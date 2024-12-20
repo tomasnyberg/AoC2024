@@ -1,5 +1,5 @@
 use std::{
-    collections::VecDeque,
+    collections::{HashMap, HashSet, VecDeque},
     io::{self, Read},
 };
 
@@ -10,45 +10,102 @@ pub struct Pos {
     j: usize,
 }
 
-pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> i32 {
-    let mut queue = VecDeque::new();
-    queue.push_back((s.i, s.j));
-    let mut visited = vec![vec![false; grid[0].len()]; grid.len()];
-    let mut steps = 0;
-    loop {
-        let n = queue.len();
-        if n == 0 {
-            panic!();
-        }
-        for _ in 0..n {
-            let (i, j) = queue.pop_front().unwrap();
-            if i == e.i && j == e.j {
-                return steps;
-            }
-            if visited[i][j] {
-                continue;
-            }
-            visited[i][j] = true;
-            for (di, dj) in DIRS4.iter() {
-                let (ni, nj) = (i as i32 + di, j as i32 + dj);
-                if ni >= 0
-                    && ni < grid.len() as i32
-                    && nj >= 0
-                    && nj < grid[0].len() as i32
-                    && grid[ni as usize][nj as usize] != '#'
-                {
-                    queue.push_back((ni as usize, nj as usize));
+pub fn find_cheats(
+    from_start: HashMap<(usize, usize), i32>,
+    from_end: HashMap<(usize, usize), i32>,
+    e: &Pos,
+    n: i32,
+    m: i32,
+) -> i32 {
+    let end_steps = from_start[&(e.i, e.j)];
+    println!("{}", end_steps);
+    let mut result = 0;
+    for (i, j) in from_start.keys() {
+        let steps = from_start[&(*i, *j)];
+        let mut seen: HashSet<(usize, usize)> = HashSet::new();
+        let mut q = VecDeque::new();
+        q.push_back((*i, *j));
+        let mut additional = 0;
+        while additional <= 20 {
+            let qlen = q.len();
+            for _ in 0..qlen {
+                let (oi, oj) = q.pop_front().unwrap();
+                if seen.contains(&(oi, oj)) {
+                    continue;
+                }
+                if from_end.contains_key(&(oi, oj)) {
+                    let total = steps + additional + from_end[&(oi, oj)];
+                    let saved = end_steps - total;
+                    if saved >= 100 {
+                        result += 1;
+                    }
+                }
+                seen.insert((oi, oj));
+                for (di, dj) in DIRS4.iter() {
+                    let (ni, nj) = (oi as i32 + di, oj as i32 + dj);
+                    if (0..n).contains(&ni) && (0..m).contains(&nj) {
+                        q.push_back((ni as usize, nj as usize));
+                    }
                 }
             }
+            additional += 1;
         }
-        steps += 1;
     }
+    result
+}
+
+pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> i32 {
+    let mut from_start: HashMap<(usize, usize), i32> = HashMap::new();
+    let mut from_end: HashMap<(usize, usize), i32> = HashMap::new();
+    for iter in 0..2 {
+        let mut steps = 0;
+        let mut queue = VecDeque::new();
+        if iter == 0 {
+            queue.push_back((s.i, s.j));
+        } else {
+            queue.push_back((e.i, e.j));
+        }
+        let map = if iter == 0 {
+            &mut from_start
+        } else {
+            &mut from_end
+        };
+        while !queue.is_empty() {
+            let n = queue.len();
+            for _ in 0..n {
+                let (i, j) = queue.pop_front().unwrap();
+                if map.contains_key(&(i, j)) {
+                    continue;
+                }
+                map.insert((i, j), steps);
+                for (di, dj) in DIRS4.iter() {
+                    let (ni, nj) = (i as i32 + di, j as i32 + dj);
+                    if ni >= 0
+                        && ni < grid.len() as i32
+                        && nj >= 0
+                        && nj < grid[0].len() as i32
+                        && grid[ni as usize][nj as usize] != '#'
+                    {
+                        queue.push_back((ni as usize, nj as usize));
+                    }
+                }
+            }
+            steps += 1;
+        }
+    }
+    find_cheats(
+        from_start,
+        from_end,
+        e,
+        grid.len() as i32,
+        grid[0].len() as i32,
+    )
 }
 
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
-    let mut grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let (mut i_s, mut j_s, mut i_e, mut j_e) = (0, 0, 0, 0);
     (0..grid.len()).for_each(|i| {
         for j in 0..grid[i].len() {
@@ -63,19 +120,6 @@ pub fn solve() {
     });
     let s = Pos { i: i_s, j: j_s };
     let e = Pos { i: i_e, j: j_e };
-    let base_steps = bfs(&grid, &s, &e);
-    let mut result = 0;
-    for i in 0..grid.len() {
-        for j in 0..grid[i].len() {
-            if grid[i][j] == '#' {
-                grid[i][j] = '.';
-                let steps = bfs(&grid, &s, &e);
-                if base_steps - steps >= 100 {
-                    result += 1;
-                }
-                grid[i][j] = '#';
-            }
-        }
-    }
-    println!("{}", result);
+    let res = bfs(&grid, &s, &e);
+    println!("{}", res);
 }
