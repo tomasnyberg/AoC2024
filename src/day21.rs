@@ -151,6 +151,31 @@ fn dirpad_char_to_seq(c: char, i: i32, j: i32) -> Vec<char> {
     finish_sequence(i, j, t_i, t_j, &PadType::Dirpad)
 }
 
+fn cached_dirpad(
+    c: char,
+    start_i: i32,
+    start_j: i32,
+    robots_left: i32,
+    cache: &mut HashMap<(char, i32, i32, i32), i64>,
+) -> i64 {
+    if robots_left == 0 {
+        let seq = dirpad_char_to_seq(c, start_i, start_j);
+        return seq.len() as i64;
+    }
+    if cache.contains_key(&(c, start_i, start_j, robots_left)) {
+        return cache[&(c, start_i, start_j, robots_left)];
+    }
+    let (mut t_i, mut t_j) = dirpad_char_to_pos(c);
+    let sequence = finish_sequence(start_i, start_j, t_i, t_j, &PadType::Dirpad);
+    let mut result = 0;
+    for seq_c in sequence.iter() {
+        //(t_i, t_j) = dirpad_char_to_pos(*seq_c);
+        result += cached_dirpad(*seq_c, 0, 2, robots_left - 1, cache);
+    }
+    cache.insert((c, start_i, start_j, robots_left), result);
+    result
+}
+
 fn dirpad_seq_to_seq(seq: &Vec<char>, mut i: i32, mut j: i32) -> (Vec<char>, i32, i32) {
     let mut result = Vec::new();
     for c in seq {
@@ -178,6 +203,16 @@ fn convert(target: &str) -> Vec<char> {
     third.0
 }
 
+fn convert_part_two(target: &str) -> i64 {
+    let seq = keypad_seq_to_seq(target, 3, 2).0;
+    let mut result = 0;
+    let mut cache = HashMap::new();
+    for c in seq.iter() {
+        result += cached_dirpad(*c, 0, 2, 26, &mut cache);
+    }
+    result
+}
+
 fn verify(start: &str) {
     let char_vec = convert(start);
     let curr = interpret_sequence(char_vec, &PadType::Dirpad);
@@ -191,16 +226,19 @@ pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let mut result = 0;
+    let mut result2 = 0;
     input.lines().for_each(|line| {
-        let num = line
+        let num: i64 = line
             .chars()
             .take(3)
             .collect::<String>()
-            .parse::<i32>()
+            .parse::<i64>()
             .unwrap();
         let char_vec = convert(line);
         verify(line);
-        result += num * char_vec.len() as i32;
+        result += num * char_vec.len() as i64;
+        result2 += num * convert_part_two(line)
     });
     println!("{}", result);
+    println!("{}", result2);
 }
