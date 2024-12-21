@@ -1,7 +1,7 @@
+use itertools::Itertools;
 use std::{
     collections::HashMap,
     io::{self, Read},
-    task::Wake,
 };
 
 #[rustfmt::skip]
@@ -152,28 +152,62 @@ fn dirpad_char_to_seq(c: char, i: i32, j: i32) -> Vec<char> {
 }
 
 fn cached_dirpad(
-    c: char,
-    start_i: i32,
-    start_j: i32,
-    robots_left: i32,
-    cache: &mut HashMap<(char, i32, i32, i32), i64>,
+    curr_char: char,
+    target_char: char,
+    robots: i32,
+    cache: &mut HashMap<(char, char, i32), i64>,
 ) -> i64 {
-    if robots_left == 0 {
-        let seq = dirpad_char_to_seq(c, start_i, start_j);
-        return seq.len() as i64;
+    let (s_i, s_j) = dirpad_char_to_pos(curr_char);
+    let (t_i, t_j) = dirpad_char_to_pos(target_char);
+    if robots == 25 {
+        return (s_i - t_i).abs() as i64 + (s_j - t_j).abs() as i64 + 1_i64;
     }
-    if cache.contains_key(&(c, start_i, start_j, robots_left)) {
-        return cache[&(c, start_i, start_j, robots_left)];
+    if cache.contains_key(&(curr_char, target_char, robots)) {
+        return cache[&(curr_char, target_char, robots)];
     }
-    let (mut t_i, mut t_j) = dirpad_char_to_pos(c);
-    let sequence = finish_sequence(start_i, start_j, t_i, t_j, &PadType::Dirpad);
-    let mut result = 0;
-    for seq_c in sequence.iter() {
-        //(t_i, t_j) = dirpad_char_to_pos(*seq_c);
-        result += cached_dirpad(*seq_c, 0, 2, robots_left - 1, cache);
+
+    let mut seq: Vec<char> = Vec::new();
+    let deltai = s_i - t_i;
+    let deltaj = s_j - t_j;
+    for _ in 0..(deltai).abs() {
+        seq.push(if deltai < 0 { 'v' } else { '^' });
     }
-    cache.insert((c, start_i, start_j, robots_left), result);
-    result
+    for _ in 0..(deltaj).abs() {
+        seq.push(if deltaj < 0 { '>' } else { '<' });
+    }
+    if seq.is_empty() {
+        return 1;
+    }
+    let mut candidates = Vec::new();
+    let perms = (0..seq.len()).permutations(seq.len());
+    for perm_indices in perms {
+        let perm: Vec<char> = perm_indices.iter().map(|&i| seq[i]).collect();
+        let mut local_result = 0;
+        let mut i = s_i;
+        let mut j = s_j;
+        for idx in 0..perm.len() {
+            local_result += cached_dirpad(
+                if idx == 0 { 'A' } else { perm[idx - 1] },
+                perm[idx],
+                robots + 1,
+                cache,
+            );
+            i += get_dir(perm[idx]).0;
+            j += get_dir(perm[idx]).1;
+            if DIR_PAD_CHARS[i as usize][j as usize] == '#' {
+                local_result = i64::MAX;
+                break;
+            }
+        }
+        if local_result == i64::MAX {
+            continue;
+        }
+        local_result += cached_dirpad(perm[perm.len() - 1], 'A', robots + 1, cache);
+        candidates.push(local_result);
+    }
+    let result = candidates.iter().min().unwrap();
+    cache.insert((curr_char, target_char, robots), *result);
+    *result
 }
 
 fn dirpad_seq_to_seq(seq: &Vec<char>, mut i: i32, mut j: i32) -> (Vec<char>, i32, i32) {
@@ -205,10 +239,10 @@ fn convert(target: &str) -> Vec<char> {
 
 fn convert_part_two(target: &str) -> i64 {
     let seq = keypad_seq_to_seq(target, 3, 2).0;
-    let mut result = 0;
     let mut cache = HashMap::new();
-    for c in seq.iter() {
-        result += cached_dirpad(*c, 0, 2, 26, &mut cache);
+    let mut result = 0;
+    for i in 0..seq.len() {
+        result += cached_dirpad(if i == 0 { 'A' } else { seq[i - 1] }, seq[i], 1, &mut cache);
     }
     result
 }
