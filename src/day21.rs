@@ -5,9 +5,9 @@ use std::{
 
 #[rustfmt::skip]
 const KEYPAD: [[char; 3]; 4] = [
-    ['1', '2', '3'],
-    ['4', '5', '6'],
     ['7', '8', '9'],
+    ['4', '5', '6'],
+    ['1', '2', '3'],
     ['#', '0', 'A'],
 ];
 
@@ -72,7 +72,14 @@ fn interpret_sequence(seq: Vec<char>, pad_type: &PadType) -> Vec<char> {
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
-    let test_seq: Vec<char> = "<AvA>A^A".chars().collect();
-    let result = interpret_sequence(test_seq, &PadType::Dirpad);
-    println!("{:?}", result);
+    let test_dirpad_seq: Vec<char> =
+        "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"
+            .chars()
+            .collect();
+    let expected: Vec<char> = "v<<A>>^A<A>AvA<^AA>A<vAAA>^A".chars().collect();
+    let result = interpret_sequence(test_dirpad_seq, &PadType::Dirpad);
+    assert_eq!(result, expected);
+    let test_keypad_seq: Vec<char> = "<A^A>^^AvvvA".chars().collect();
+    let result = interpret_sequence(test_keypad_seq, &PadType::Keypad);
+    assert_eq!(result, vec!['0', '2', '9', 'A']);
 }
