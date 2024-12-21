@@ -181,6 +181,15 @@ fn convert(target: &str) -> Vec<char> {
     third.0
 }
 
+fn verify(start: &str) {
+    let char_vec = convert(start);
+    let curr = interpret_sequence(char_vec, &PadType::Dirpad);
+    let curr = interpret_sequence(curr, &PadType::Dirpad);
+    let curr = interpret_sequence(curr, &PadType::Keypad);
+    let end_str: String = curr.iter().collect();
+    assert_eq!(start, end_str);
+}
+
 fn test_interpret_sequence() {
     let test_dirpad_seq: Vec<char> =
         "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"
@@ -209,24 +218,11 @@ fn test_keypad_digit_to_seq() {
     );
 }
 
-fn test_dirpad_char_to_seq() {
-    let (mut i, mut j) = (0, 2);
-    let mut full_seq: Vec<char> = Vec::new();
-    let target = "<A^A>^^AvvvA";
-    for target_c in target.chars() {
-        let seq = dirpad_char_to_seq(target_c, i, j);
-        full_seq.extend(seq);
-        (i, j) = dirpad_char_to_pos(target_c);
-    }
-    println!("{:?}", full_seq.iter().collect::<String>());
-}
-
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     test_interpret_sequence();
     test_keypad_digit_to_seq();
-    test_dirpad_char_to_seq();
     let mut result = 0;
     input.lines().for_each(|line| {
         // take first three chars of line and convert it to a number (they are all digits)
@@ -237,7 +233,7 @@ pub fn solve() {
             .parse::<i32>()
             .unwrap();
         let char_vec = convert(line);
-        println!("len {}, num {}", char_vec.len(), num);
+        verify(line);
         result += num * char_vec.len() as i32;
     });
     println!("{}", result);
