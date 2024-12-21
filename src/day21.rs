@@ -125,13 +125,6 @@ fn finish_sequence(i: i32, j: i32, t_i: i32, t_j: i32, p: &PadType) -> Vec<char>
         '>' => 3,
         _ => panic!(), // Catch-all for unexpected characters
     };
-    let other_priority = |c: &char| match c {
-        '<' => 3,
-        'v' => 2,
-        '^' => 1,
-        '>' => 0,
-        _ => panic!(), // Catch-all for unexpected characters
-    };
     let mut seq: Vec<char> = Vec::new();
     for _ in 0..diffj.abs() {
         seq.push(if dj == -1 { '<' } else { '>' });
@@ -142,7 +135,7 @@ fn finish_sequence(i: i32, j: i32, t_i: i32, t_j: i32, p: &PadType) -> Vec<char>
     seq.sort_by_key(priority);
     let bad_idx = valid_seq(&seq, i, j, p);
     if bad_idx != -1 {
-        seq.sort_by_key(other_priority);
+        seq.reverse();
     }
     seq.push('A');
     seq
