@@ -1,6 +1,7 @@
 use std::{
     collections::HashMap,
     io::{self, Read},
+    task::Wake,
 };
 
 #[rustfmt::skip]
@@ -103,28 +104,42 @@ fn dirpad_char_to_pos(c: char) -> (i32, i32) {
     panic!("Invalid char");
 }
 
+fn valid_seq(seq: &Vec<char>, mut i: i32, mut j: i32, p: &PadType) -> bool {
+    for c in seq {
+        let (di, dj) = get_dir(*c);
+        (i, j) = (i + di, j + dj);
+        if !valid_square(i, j, p) {
+            return false;
+        }
+    }
+    true
+}
+
 fn finish_sequence(i: i32, j: i32, t_i: i32, t_j: i32, p: &PadType) -> Vec<char> {
     let (diffi, diffj) = (t_i - i, t_j - j);
     let (di, dj) = (diffi.signum(), diffj.signum());
-    let mut seqa: Vec<char> = Vec::new();
-    for _ in 0..diffi.abs() {
-        seqa.push(if di == -1 { '^' } else { 'v' });
-    }
+    let priority = |c: &char| match c {
+        '<' => 1,
+        'v' => 0,
+        '^' => 4,
+        '>' => 3,
+        _ => 4, // Catch-all for unexpected characters
+    };
+    let mut seq: Vec<char> = Vec::new();
     for _ in 0..diffj.abs() {
-        seqa.push(if dj == -1 { '<' } else { '>' });
-    }
-    let mut seqb: Vec<char> = Vec::new();
-    for _ in 0..diffj.abs() {
-        seqb.push(if dj == -1 { '<' } else { '>' });
+        seq.push(if dj == -1 { '<' } else { '>' });
     }
     for _ in 0..diffi.abs() {
-        seqb.push(if di == -1 { '^' } else { 'v' });
+        seq.push(if di == -1 { '^' } else { 'v' });
     }
-    if !valid_square(t_i, j, p) {
-        seqa = seqb;
+    seq.sort_by_key(priority);
+    if !valid_seq(&seq, i, j, p) {
+        // pop the last element of seq and put it first
+        let last = seq.pop().unwrap();
+        seq.insert(0, last);
     }
-    seqa.push('A');
-    seqa
+    seq.push('A');
+    seq
 }
 
 fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
@@ -166,9 +181,14 @@ fn convert(target: &str) -> Vec<char> {
 
 fn verify(start: &str) {
     let char_vec = convert(start);
+    println!();
+    println!("{:?}", char_vec.iter().collect::<String>());
     let curr = interpret_sequence(char_vec, &PadType::Dirpad);
+    println!("{:?}", curr.iter().collect::<String>());
     let curr = interpret_sequence(curr, &PadType::Dirpad);
+    println!("{:?}", curr.iter().collect::<String>());
     let curr = interpret_sequence(curr, &PadType::Keypad);
+    println!("{:?}", curr.iter().collect::<String>());
     let end_str: String = curr.iter().collect();
     assert_eq!(start, end_str);
 }
@@ -177,6 +197,12 @@ pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let mut result = 0;
+    let target = "<A>A<AAv<AA>>^AvAA^Av<AAA^>A";
+    let better_target = "<A>A<AAv<AA>>^AvAA^A<vAAA^>A";
+    let dirpadded_orig = dirpad_seq_to_seq(&target.chars().collect(), 0, 2).0;
+    let dirpadded_new = dirpad_seq_to_seq(&better_target.chars().collect(), 0, 2).0;
+    println!("{:?}", dirpadded_orig.iter().collect::<String>());
+    println!("{:?}", dirpadded_new.iter().collect::<String>());
     input.lines().for_each(|line| {
         let num = line
             .chars()
@@ -186,6 +212,7 @@ pub fn solve() {
             .unwrap();
         let char_vec = convert(line);
         verify(line);
+        println!("{}", char_vec.len());
         result += num * char_vec.len() as i32;
     });
     println!("{}", result);
