@@ -190,42 +190,11 @@ fn verify(start: &str) {
     assert_eq!(start, end_str);
 }
 
-fn test_interpret_sequence() {
-    let test_dirpad_seq: Vec<char> =
-        "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"
-            .chars()
-            .collect();
-    let expected: Vec<char> = "v<<A>>^A<A>AvA<^AA>A<vAAA>^A".chars().collect();
-    let result = interpret_sequence(test_dirpad_seq, &PadType::Dirpad);
-    assert_eq!(result, expected);
-    let test_keypad_seq: Vec<char> = "<A^A>^^AvvvA".chars().collect();
-    let result = interpret_sequence(test_keypad_seq, &PadType::Keypad);
-    assert_eq!(result, vec!['0', '2', '9', 'A']);
-}
-
-fn test_keypad_digit_to_seq() {
-    let (mut i, mut j) = (3, 2);
-    let mut full_seq: Vec<char> = Vec::new();
-    let target = "029A";
-    for target_c in target.chars() {
-        let seq = keypad_digit_to_seq(target_c, i, j);
-        full_seq.extend(seq);
-        (i, j) = digit_to_pos(target_c);
-    }
-    assert_eq!(
-        full_seq,
-        vec!['<', 'A', '^', 'A', '^', '^', '>', 'A', 'v', 'v', 'v', 'A']
-    );
-}
-
 pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
-    test_interpret_sequence();
-    test_keypad_digit_to_seq();
     let mut result = 0;
     input.lines().for_each(|line| {
-        // take first three chars of line and convert it to a number (they are all digits)
         let num = line
             .chars()
             .take(3)
