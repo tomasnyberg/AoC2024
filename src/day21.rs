@@ -154,6 +154,33 @@ fn dirpad_char_to_seq(c: char, i: i32, j: i32) -> Vec<char> {
     seqa
 }
 
+fn dirpad_seq_to_seq(seq: &Vec<char>, mut i: i32, mut j: i32) -> (Vec<char>, i32, i32) {
+    let mut result = Vec::new();
+    for c in seq {
+        let seq = dirpad_char_to_seq(*c, i, j);
+        result.extend(seq);
+        (i, j) = dirpad_char_to_pos(*c);
+    }
+    (result, i, j)
+}
+
+fn keypad_seq_to_seq(seq: &str, mut i: i32, mut j: i32) -> (Vec<char>, i32, i32) {
+    let mut result = Vec::new();
+    for c in seq.chars() {
+        let seq = keypad_digit_to_seq(c, i, j);
+        result.extend(seq);
+        (i, j) = digit_to_pos(c);
+    }
+    (result, i, j)
+}
+
+fn convert(target: &str) -> Vec<char> {
+    let first = keypad_seq_to_seq(target, 3, 2).0;
+    let second = dirpad_seq_to_seq(&first, 0, 2).0;
+    let third = dirpad_seq_to_seq(&second, 0, 2);
+    third.0
+}
+
 fn test_interpret_sequence() {
     let test_dirpad_seq: Vec<char> =
         "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"
@@ -200,4 +227,18 @@ pub fn solve() {
     test_interpret_sequence();
     test_keypad_digit_to_seq();
     test_dirpad_char_to_seq();
+    let mut result = 0;
+    input.lines().for_each(|line| {
+        // take first three chars of line and convert it to a number (they are all digits)
+        let num = line
+            .chars()
+            .take(3)
+            .collect::<String>()
+            .parse::<i32>()
+            .unwrap();
+        let char_vec = convert(line);
+        println!("len {}, num {}", char_vec.len(), num);
+        result += num * char_vec.len() as i32;
+    });
+    println!("{}", result);
 }
