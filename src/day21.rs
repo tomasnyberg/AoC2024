@@ -103,8 +103,7 @@ fn dirpad_char_to_pos(c: char) -> (i32, i32) {
     panic!("Invalid char");
 }
 
-fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
-    let (t_i, t_j) = digit_to_pos(digit);
+fn finish_sequence(i: i32, j: i32, t_i: i32, t_j: i32, p: &PadType) -> Vec<char> {
     let (diffi, diffj) = (t_i - i, t_j - j);
     let (di, dj) = (diffi.signum(), diffj.signum());
     let mut seqa: Vec<char> = Vec::new();
@@ -121,37 +120,21 @@ fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
     for _ in 0..diffi.abs() {
         seqb.push(if di == -1 { '^' } else { 'v' });
     }
-    // If moving vertically straight to it is invalid, then move horizontally first
-    if !valid_square(t_i, j, &PadType::Keypad) {
+    if !valid_square(t_i, j, p) {
         seqa = seqb;
     }
     seqa.push('A');
     seqa
 }
 
+fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
+    let (t_i, t_j) = digit_to_pos(digit);
+    finish_sequence(i, j, t_i, t_j, &PadType::Keypad)
+}
+
 fn dirpad_char_to_seq(c: char, i: i32, j: i32) -> Vec<char> {
     let (t_i, t_j) = dirpad_char_to_pos(c);
-    let (diffi, diffj) = (t_i - i, t_j - j);
-    let (di, dj) = (diffi.signum(), diffj.signum());
-    let mut seqa: Vec<char> = Vec::new();
-    for _ in 0..diffi.abs() {
-        seqa.push(if di == -1 { '^' } else { 'v' });
-    }
-    for _ in 0..diffj.abs() {
-        seqa.push(if dj == -1 { '<' } else { '>' });
-    }
-    let mut seqb: Vec<char> = Vec::new();
-    for _ in 0..diffj.abs() {
-        seqb.push(if dj == -1 { '<' } else { '>' });
-    }
-    for _ in 0..diffi.abs() {
-        seqb.push(if di == -1 { '^' } else { 'v' });
-    }
-    if !valid_square(t_i, j, &PadType::Dirpad) {
-        seqa = seqb;
-    }
-    seqa.push('A');
-    seqa
+    finish_sequence(i, j, t_i, t_j, &PadType::Dirpad)
 }
 
 fn dirpad_seq_to_seq(seq: &Vec<char>, mut i: i32, mut j: i32) -> (Vec<char>, i32, i32) {
