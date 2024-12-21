@@ -91,6 +91,18 @@ fn digit_to_pos(digit: char) -> (i32, i32) {
     }
 }
 
+// TODO perf
+fn dirpad_char_to_pos(c: char) -> (i32, i32) {
+    for i in 0..2 {
+        for j in 0..3 {
+            if DIR_PAD_CHARS[i][j] == c {
+                return (i as i32, j as i32);
+            }
+        }
+    }
+    panic!("Invalid char");
+}
+
 fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
     let (t_i, t_j) = digit_to_pos(digit);
     let (diffi, diffj) = (t_i - i, t_j - j);
@@ -117,9 +129,32 @@ fn keypad_digit_to_seq(digit: char, i: i32, j: i32) -> Vec<char> {
     seqa
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+fn dirpad_char_to_seq(c: char, i: i32, j: i32) -> Vec<char> {
+    let (t_i, t_j) = dirpad_char_to_pos(c);
+    let (diffi, diffj) = (t_i - i, t_j - j);
+    let (di, dj) = (diffi.signum(), diffj.signum());
+    let mut seqa: Vec<char> = Vec::new();
+    for _ in 0..diffi.abs() {
+        seqa.push(if di == -1 { '^' } else { 'v' });
+    }
+    for _ in 0..diffj.abs() {
+        seqa.push(if dj == -1 { '<' } else { '>' });
+    }
+    let mut seqb: Vec<char> = Vec::new();
+    for _ in 0..diffj.abs() {
+        seqb.push(if dj == -1 { '<' } else { '>' });
+    }
+    for _ in 0..diffi.abs() {
+        seqb.push(if di == -1 { '^' } else { 'v' });
+    }
+    if !valid_square(t_i, j, &PadType::Dirpad) {
+        seqa = seqb;
+    }
+    seqa.push('A');
+    seqa
+}
+
+fn test_interpret_sequence() {
     let test_dirpad_seq: Vec<char> =
         "<vA<AA>>^AvAA<^A>A<v<A>>^AvA^A<vA>^A<v<A>^A>AAvA^A<v<A>A>^AAAvA<^A>A"
             .chars()
@@ -130,6 +165,9 @@ pub fn solve() {
     let test_keypad_seq: Vec<char> = "<A^A>^^AvvvA".chars().collect();
     let result = interpret_sequence(test_keypad_seq, &PadType::Keypad);
     assert_eq!(result, vec!['0', '2', '9', 'A']);
+}
+
+fn test_keypad_digit_to_seq() {
     let (mut i, mut j) = (3, 2);
     let mut full_seq: Vec<char> = Vec::new();
     let target = "029A";
@@ -142,4 +180,24 @@ pub fn solve() {
         full_seq,
         vec!['<', 'A', '^', 'A', '^', '^', '>', 'A', 'v', 'v', 'v', 'A']
     );
+}
+
+fn test_dirpad_char_to_seq() {
+    let (mut i, mut j) = (0, 2);
+    let mut full_seq: Vec<char> = Vec::new();
+    let target = "<A^A>^^AvvvA";
+    for target_c in target.chars() {
+        let seq = dirpad_char_to_seq(target_c, i, j);
+        full_seq.extend(seq);
+        (i, j) = dirpad_char_to_pos(target_c);
+    }
+    println!("{:?}", full_seq.iter().collect::<String>());
+}
+
+pub fn solve() {
+    let mut input = String::new();
+    io::stdin().read_to_string(&mut input).unwrap();
+    test_interpret_sequence();
+    test_keypad_digit_to_seq();
+    test_dirpad_char_to_seq();
 }
