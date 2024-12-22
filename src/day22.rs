@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet},
-    io::{self, Read},
-};
+use std::io::{self, Read};
 
 fn evolve(mut secret: i64) -> i64 {
     secret ^= secret << 6 & 0xFFFFFF;
@@ -13,12 +10,12 @@ pub fn solve() {
     let mut input = String::new();
     io::stdin().read_to_string(&mut input).unwrap();
     let nums: Vec<i64> = input.lines().map(|line| line.parse().unwrap()).collect();
-    let mut totals: HashMap<i64, i64> = HashMap::new();
+    let mut bananas = vec![0; 1 << 20];
+    let mut seen = vec![2000; 1 << 20];
     let mut part_one = 0;
-    for num in nums {
-        let mut curr = num;
+    (0..nums.len()).for_each(|j| {
+        let mut curr = nums[j];
         let mut prev_ones = curr % 10;
-        let mut seen: HashSet<i64> = HashSet::new();
         let mut curr_key = 0;
         for i in 0..2000 {
             curr = evolve(curr);
@@ -28,13 +25,13 @@ pub fn solve() {
             curr_key += diff;
             curr_key &= (1 << 20) - 1;
             prev_ones = ones;
-            if i > 3 && !seen.contains(&curr_key) {
-                totals.insert(curr_key, *totals.get(&curr_key).unwrap_or(&0) + ones);
-                seen.insert(curr_key);
+            if i > 3 && seen[curr_key as usize] != j {
+                bananas[curr_key as usize] += ones;
+                seen[curr_key as usize] = j;
             }
         }
         part_one += curr;
-    }
+    });
     println!("{}", part_one);
-    println!("{}", totals.values().max().unwrap());
+    println!("{}", bananas.iter().max().unwrap());
 }
