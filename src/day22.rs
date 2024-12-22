@@ -18,6 +18,7 @@ pub fn solve() {
     io::stdin().read_to_string(&mut input).unwrap();
     let nums: Vec<i64> = input.lines().map(|line| line.parse().unwrap()).collect();
     let mut totals: HashMap<(i64, i64, i64, i64), i64> = HashMap::new();
+    let mut part_one = 0;
     for num in nums {
         let mut curr = num;
         let mut prev_ones = curr % 10;
@@ -40,10 +41,11 @@ pub fn solve() {
                 seen.insert(curr_key, ones);
             }
         }
+        part_one += curr;
         for (k, v) in seen {
             totals.insert(k, *totals.get(&k).unwrap_or(&0) + v);
         }
     }
-    //println!("{:?}", totals);
+    println!("{}", part_one);
     println!("{}", totals.values().max().unwrap());
 }
