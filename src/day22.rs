@@ -4,13 +4,9 @@ use std::{
 };
 
 fn evolve(mut secret: i64) -> i64 {
-    secret ^= secret * 64;
-    secret %= 16777216;
-    secret ^= secret / 32;
-    secret %= 16777216;
-    secret ^= secret * 2048;
-    secret %= 16777216;
-    secret
+    secret ^= secret << 6 & 0xFFFFFF;
+    secret ^= secret >> 5 & 0xFFFFFF;
+    secret ^ secret << 11 & 0xFFFFFF
 }
 
 pub fn solve() {
