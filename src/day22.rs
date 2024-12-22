@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::{HashMap, HashSet, VecDeque},
     io::{self, Read},
 };
 
@@ -23,7 +23,7 @@ pub fn solve() {
         let mut curr = num;
         let mut prev_ones = curr % 10;
         let mut dq: VecDeque<i64> = VecDeque::new();
-        let mut seen: HashMap<(i64, i64, i64, i64), i64> = HashMap::new();
+        let mut seen: HashSet<(i64, i64, i64, i64)> = HashSet::new();
         let mut curr_key = (-11, -11, -11, -11);
         for _ in 0..2000 {
             curr = evolve(curr);
@@ -37,14 +37,12 @@ pub fn solve() {
             if dq.len() == 4 {
                 curr_key = (dq[0], dq[1], dq[2], dq[3]);
             }
-            if curr_key != (-11, -11, -11, -11) && !seen.contains_key(&curr_key) {
-                seen.insert(curr_key, ones);
+            if curr_key != (-11, -11, -11, -11) && !seen.contains(&curr_key) {
+                totals.insert(curr_key, *totals.get(&curr_key).unwrap_or(&0) + ones);
+                seen.insert(curr_key);
             }
         }
         part_one += curr;
-        for (k, v) in seen {
-            totals.insert(k, *totals.get(&k).unwrap_or(&0) + v);
-        }
     }
     println!("{}", part_one);
     println!("{}", totals.values().max().unwrap());
