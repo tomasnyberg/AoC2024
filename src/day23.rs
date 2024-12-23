@@ -1,46 +1,7 @@
 use std::collections::HashMap;
 use std::io::{self, Read};
 
-fn bfs(start: &str, adj: &HashMap<&str, Vec<&str>>) -> Vec<String> {
-    let mut queue: Vec<&str> = vec![start];
-    let mut counts: HashMap<&str, i32> = HashMap::new();
-    for _ in 0..3 {
-        let mut next: Vec<&str> = vec![];
-        for node in queue {
-            let val = counts.entry(node).or_default();
-            *val += 1;
-            for nbr in adj[node].iter() {
-                next.push(nbr);
-            }
-        }
-        queue = next;
-    }
-    let mut biggest = 0;
-    for val in counts.values() {
-        if val < &biggest {
-            continue;
-        }
-        let mut occurrences = 0;
-        for other_val in counts.values() {
-            if val <= other_val {
-                occurrences += 1;
-            }
-        }
-        if occurrences - 1 == *val {
-            biggest = *val;
-        }
-    }
-    if biggest == 0 {
-        return vec![];
-    }
-    let mut result = vec![];
-    for (key, val) in counts.iter() {
-        if val >= &biggest {
-            result.push(key.to_string());
-        }
-    }
-    result
-}
+use itertools::Itertools;
 
 pub fn solve() {
     let mut input = String::new();
@@ -69,16 +30,15 @@ pub fn solve() {
             }
         }
     }
-    let mut longest = 0;
-    let mut longest_path: Vec<String> = vec![];
-    for key in adj.keys() {
-        let path = bfs(key, &adj);
-        if path.len() > longest {
-            longest = path.len();
-            longest_path = path;
+    let mut networks: Vec<Vec<&str>> = adj.keys().map(|&key| vec![key]).collect();
+    for network in networks.iter_mut() {
+        for node in adj.keys() {
+            if network.iter().all(|&n| adj[n].contains(node)) {
+                network.push(node);
+            }
         }
     }
-    longest_path.sort();
-    println!("{}", longest_path.join(","));
+    let longest_path = networks.iter().max_by_key(|network| network.len()).unwrap();
     println!("{}", result / 6);
+    println!("{}", longest_path.iter().sorted().join(","));
 }
