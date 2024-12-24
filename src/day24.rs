@@ -1,4 +1,5 @@
 use std::{
+    char,
     collections::{HashMap, VecDeque},
     io::{self, Read},
 };
@@ -14,6 +15,52 @@ struct Gate {
     input2: (char, char, char),
     output: (char, char, char),
     gate_type: GateType,
+}
+
+fn simulate(
+    wire_state: &mut HashMap<(char, char, char), bool>,
+    adj: &HashMap<(char, char, char), Vec<usize>>,
+    gates: &[Gate],
+) -> u64 {
+    let mut dq: VecDeque<(char, char, char)> = VecDeque::new();
+    for i in 0..45 {
+        for c in ['x', 'y'].iter() {
+            let key = (
+                *c,
+                ((i / 10) as u8 + b'0') as char,
+                ((i % 10) as u8 + b'0') as char,
+            );
+            dq.push_back(key);
+        }
+    }
+    while !dq.is_empty() {
+        let (a, b, c) = dq.pop_front().unwrap();
+        if !adj.contains_key(&(a, b, c)) {
+            continue;
+        }
+        for idx in adj[&(a, b, c)].iter() {
+            let gate = &gates[*idx];
+            if wire_state.contains_key(&gate.input1) && wire_state.contains_key(&gate.input2) {
+                let output = &gates[*idx].output;
+                let value = match gate.gate_type {
+                    GateType::And => wire_state[&gate.input1] & wire_state[&gate.input2],
+                    GateType::Or => wire_state[&gate.input1] | wire_state[&gate.input2],
+                    GateType::Xor => wire_state[&gate.input1] ^ wire_state[&gate.input2],
+                };
+                wire_state.insert(*output, value);
+                dq.push_back((output.0, output.1, output.2));
+            }
+        }
+    }
+    let mut result = 0;
+    for (key, value) in wire_state.iter() {
+        if key.0 == 'z' {
+            let num = key.1.to_string() + &key.2.to_string();
+            let num = num.parse::<i32>().unwrap();
+            result += (*value as u64) << num;
+        }
+    }
+    result
 }
 
 pub fn solve() {
@@ -60,32 +107,6 @@ pub fn solve() {
         adj.entry(key_b).or_default().push(gates.len());
         gates.push(gate);
     });
-    while !dq.is_empty() {
-        let (a, b, c, _value) = dq.pop_front().unwrap();
-        if !adj.contains_key(&(a, b, c)) {
-            continue;
-        }
-        for idx in adj[&(a, b, c)].iter() {
-            let gate = &gates[*idx];
-            if wire_state.contains_key(&gate.input1) && wire_state.contains_key(&gate.input2) {
-                let output = &gates[*idx].output;
-                let value = match gate.gate_type {
-                    GateType::And => wire_state[&gate.input1] & wire_state[&gate.input2],
-                    GateType::Or => wire_state[&gate.input1] | wire_state[&gate.input2],
-                    GateType::Xor => wire_state[&gate.input1] ^ wire_state[&gate.input2],
-                };
-                wire_state.insert(*output, value);
-                dq.push_back((output.0, output.1, output.2, value));
-            }
-        }
-    }
-    let mut result = 0;
-    for (key, value) in wire_state.iter() {
-        if key.0 == 'z' {
-            let num = key.1.to_string() + &key.2.to_string();
-            let num = num.parse::<i32>().unwrap();
-            result += (*value as u64) << num;
-        }
-    }
-    println!("{}", result);
+    let part_one = simulate(&mut wire_state, &adj, &gates);
+    println!("{}", part_one);
 }
