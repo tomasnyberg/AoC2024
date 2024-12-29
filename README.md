@@ -1,6 +1,6 @@
 ## Advent of code 2024
 My solutions for the 2024 Advent of Code event. All solutions are written in Rust, and are of questionable quality since it's my first time using the language.
-The code is reasonably performant however and solves all problems in < 300 ms (see benchmarks below).
+The code is reasonably performant however and solves all problems in ~ 200 ms (see benchmarks below).
 
 ### Benchmarks
 Results from `./run.sh` in WSL using a 2016 Asus ZenBook UX303 (Ryzen 7 5700U 1.8GHz, 16GB RAM)
@@ -8,33 +8,33 @@ Results from `./run.sh` in WSL using a 2016 Asus ZenBook UX303 (Ryzen 7 5700U 1.
 ----------------------------------------
 Day        Time (ms)       Cumulative (ms)
 ----------------------------------------
-1          0.30            0.30
-2          0.53            0.83
-3          0.16            0.99
-4          0.55            1.54
-5          1.71            3.25
-6          24.98           28.23
-7          13.11           41.34
-8          0.38            41.72
-9          2.40            44.13
-10         0.57            44.70
-11         7.81            52.50
-12         2.60            55.11
-13         1.41            56.52
-14         53.28           109.80
-15         2.51            112.31
-16         31.24           143.55
-17         0.05            143.60
-18         0.57            144.17
-19         1.87            146.04
-20         70.11           216.14
-21         10.96           227.11
-22         20.79           247.89
-23         25.34           273.23
-24         0.31            273.54
-25         0.07            273.61
+1          0.21            0.21
+2          0.46            0.66
+3          0.06            0.72
+4          0.53            1.25
+5          1.62            2.87
+6          22.79           25.65
+7          12.82           38.47
+8          0.44            38.91
+9          2.64            41.55
+10         0.50            42.05
+11         7.65            49.70
+12         2.65            52.34
+13         1.75            54.09
+14         52.70           106.79
+15         2.51            109.29
+16         30.36           139.66
+17         0.05            139.71
+18         0.56            140.26
+19         1.91            142.17
+20         10.85           153.02
+21         10.69           163.71
+22         19.20           182.92
+23         25.09           208.01
+24         0.28            208.28
+25         0.07            208.35
 ----------------------------------------
-Total                      273.61
+Total                      208.35
 ```
 
 ### Requirements
