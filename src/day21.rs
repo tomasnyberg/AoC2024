@@ -1,8 +1,5 @@
 use itertools::Itertools;
-use std::{
-    collections::HashMap,
-    io::{self, Read},
-};
+use std::collections::HashMap;
 
 #[rustfmt::skip]
 const KEYPAD: [[char; 3]; 4] = [
@@ -156,9 +153,7 @@ fn solve_parts(target: &str, max: i32) -> i64 {
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut result = 0;
     let mut result2 = 0;
     input.lines().for_each(|line| {

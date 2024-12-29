@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 pub fn safe_report(xs: Vec<i32>) -> i32 {
     let increasing: bool = xs.windows(2).all(|x| x[0] < x[1]);
     let decreasing: bool = xs.windows(2).all(|x| x[0] > x[1]);
@@ -26,9 +24,7 @@ pub fn part_two(xss: Vec<Vec<i32>>) -> i32 {
         .sum()
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let xss: Vec<Vec<i32>> = input
         .split("\n")
         .filter(|x| !x.is_empty())

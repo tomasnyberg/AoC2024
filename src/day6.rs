@@ -1,7 +1,6 @@
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::io::{self, Read};
 
 const DIRS4: [(i32, i32); 4] = [(-1, 0), (0, 1), (1, 0), (0, -1)];
 const _DIRS_STYLE: [char; 4] = ['^', '>', 'v', '<'];
@@ -158,9 +157,7 @@ fn part_two(
         .sum()
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let target = '^';
     let mut t_i = 0;

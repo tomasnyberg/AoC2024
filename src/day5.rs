@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::io::{self, Read};
 
 fn part_one(lists: &[Vec<i32>], rules: &HashMap<i32, Vec<i32>>) -> (i32, Vec<usize>) {
     let mut result = 0;
@@ -60,10 +59,7 @@ fn part_two(lists: &[Vec<i32>], rules: &HashMap<i32, Vec<i32>>, bad_indices: Vec
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
-
+pub fn solve(input: String) {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let edges: Vec<&str> = parts[0].lines().collect();
     let lists: Vec<Vec<i32>> = parts[1]

@@ -1,7 +1,4 @@
-use std::{
-    collections::HashSet,
-    io::{self, Read},
-};
+use std::collections::HashSet;
 
 const DIRS4: [(i32, i32); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 const VALID_DIRS: [((i32, i32), (i32, i32)); 4] = [
@@ -59,9 +56,7 @@ pub fn count_sides(perimeter: &HashSet<(i32, i32, i32)>) -> i32 {
     sides
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let lines: Vec<Vec<char>> = input.lines().map(|l| l.chars().collect()).collect();
     let mut visited = vec![vec![false; lines[0].len()]; lines.len()];
     let mut result_part_one = 0;

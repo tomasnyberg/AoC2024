@@ -1,7 +1,4 @@
-use std::{
-    collections::VecDeque,
-    io::{self, Read},
-};
+use std::collections::VecDeque;
 
 const DIRS4: [(i8, i8); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 
@@ -57,9 +54,7 @@ pub fn dfs(matrix: &[Vec<i8>], i: i8, j: i8) -> i16 {
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let matrix: Vec<Vec<i8>> = input
         .lines()
         .map(|line| line.chars().map(|c| c as i8 - '0' as i8).collect())

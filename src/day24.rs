@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    io::{self, Read},
-};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy)]
 enum GateType {
@@ -92,9 +89,7 @@ fn get_problematic(types: &HashSet<(String, GateType)>, gates: &[Gate]) -> Strin
     parts.join(",")
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut parts = input.split("\n\n");
     let mut wire_state: Vec<usize> = Vec::new(); // 0 is false, 1 is true, 2 is unknown
     let mut gates: Vec<Gate> = Vec::new();

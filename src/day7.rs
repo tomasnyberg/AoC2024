@@ -1,5 +1,4 @@
 use rayon::prelude::*;
-use std::io::{self, Read};
 
 fn part_one(xss: &[Vec<i64>], targets: &[i64]) -> i64 {
     sum_results(true, xss, targets)
@@ -40,9 +39,7 @@ fn dfs(target: i64, i: usize, matrix: &Vec<i64>, running: i64, part_one: bool) -
     con || add || mul
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let split: Vec<(String, String)> = input
         .lines()
         .map(|line| {

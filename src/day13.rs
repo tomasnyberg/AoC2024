@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 fn into_digits(s: &str) -> (i64, i64) {
     let parts: Vec<i64> = s
         .split(": ")
@@ -49,9 +47,7 @@ pub fn find_combo(a: (i64, i64), b: (i64, i64), prize: (i64, i64)) -> i64 {
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut part_one = 0;
     let mut part_two = 0;
     input.split("\n\n").for_each(|parts| {

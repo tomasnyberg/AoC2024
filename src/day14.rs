@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 const DIRS8: [(i32, i32); 8] = [
     (1, 0),
     (0, 1),
@@ -56,9 +54,7 @@ pub fn score(robots: &[(i32, i32, i32, i32)], n: i32, m: i32) -> i32 {
     scores.iter().cloned().reduce(|a, b| (a * b)).unwrap_or(0)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut robots: Vec<(i32, i32, i32, i32)> = Vec::new();
     let n = 103;
     let m = 101;

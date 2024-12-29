@@ -1,8 +1,4 @@
-use std::{
-    collections::HashMap,
-    collections::HashSet,
-    io::{self, Read},
-};
+use std::{collections::HashMap, collections::HashSet};
 
 fn mirror(a: (i32, i32), b: (i32, i32)) -> ((i32, i32), (i32, i32)) {
     let di = b.0 - a.0;
@@ -31,9 +27,7 @@ fn resonance_mirror(a: (i32, i32), b: (i32, i32), n: i32, m: i32) -> HashSet<(i3
     seen
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let split: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let n = split.len() as i32;
     let m = split[0].len() as i32;

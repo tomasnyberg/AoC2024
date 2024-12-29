@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    io::{self, Read},
-};
+use std::collections::HashMap;
 
 struct TrieNode {
     children: Vec<Option<Box<TrieNode>>>,
@@ -52,9 +49,7 @@ fn search(
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut parts = input.split("\n\n");
     let patterns = parts.next().unwrap().split(", ").collect::<Vec<&str>>();
     let targets: Vec<Vec<char>> = parts

@@ -1,7 +1,4 @@
-use std::{
-    collections::{HashMap, VecDeque},
-    io::{self, Read},
-};
+use std::collections::{HashMap, VecDeque};
 
 const MOVE_CHARS: [char; 4] = ['^', '>', 'v', '<'];
 const MOVE_VECTORS: [(i32, i32); 4] = [(-1, 0), (0, 1), (1, 0), (0, -1)];
@@ -173,9 +170,7 @@ fn part_two(matrix: &[Vec<char>], moves: &str) -> i32 {
     score(&matrix)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut parts = input.split("\n\n");
     let matrix: Vec<Vec<char>> = parts
         .next()

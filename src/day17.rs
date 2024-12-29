@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 // 0 = adv, divide A by 2^combo operand
 // 1 = bxl, bitwise XOR B
 // 2 = bst, modulo 8 combo operand and store in B
@@ -86,9 +84,7 @@ fn dfs(idx: i64, instructions: &[i64], curr_a: i64) -> i64 {
     -1
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut parts = input.split("\n\n");
     let registers: Vec<i64> = parts
         .next()

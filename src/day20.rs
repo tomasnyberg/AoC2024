@@ -1,8 +1,5 @@
 use rayon::prelude::*;
-use std::{
-    collections::{HashMap, VecDeque},
-    io::{self, Read},
-};
+use std::collections::{HashMap, VecDeque};
 
 const DIRS4: [(i32, i32); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 
@@ -86,9 +83,7 @@ pub fn bfs(grid: &[Vec<char>], s: &Pos, e: &Pos) -> (i32, i32) {
     (part_one, part_two)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let (mut i_s, mut j_s, mut i_e, mut j_e) = (0, 0, 0, 0);
     (0..grid.len()).for_each(|i| {

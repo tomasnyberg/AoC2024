@@ -1,7 +1,6 @@
 use std::cmp::{max, Reverse};
 use std::collections::BinaryHeap;
 use std::collections::HashSet;
-use std::io::{self, Read};
 
 fn score(disk: &[i64], end: usize) -> i64 {
     disk.iter()
@@ -106,9 +105,7 @@ pub fn part_two(original_disk: Vec<i64>) -> i64 {
     score(&disk, disk.len())
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut disk: Vec<i64> = vec![];
     let mut flag = 1;
     let mut file_id = 0;

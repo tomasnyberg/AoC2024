@@ -1,7 +1,6 @@
 use std::{
     cmp::Reverse,
     collections::{BinaryHeap, HashMap, HashSet, VecDeque},
-    io::{self, Read},
 };
 
 const DIRS4: [(i32, i32); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
@@ -68,9 +67,7 @@ fn dijkstra(matrix: &[Vec<char>], i_s: usize, j_s: usize) -> (i32, i32) {
     (max_c, unique_squares)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let matrix: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     let (mut i_s, mut j_s) = (0, 0);
     (0..matrix.len()).for_each(|i| {

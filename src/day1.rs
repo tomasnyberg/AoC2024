@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::io::{self, Read};
 
 fn part_one(a: &Vec<i32>, b: &Vec<i32>) {
     let result: i32 = a.iter().zip(b.iter()).map(|(x, y)| (x - y).abs()).sum();
@@ -15,9 +14,7 @@ fn part_two(a: Vec<i32>, b: Vec<i32>) {
     println!("{}", result);
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let xs: Vec<i32> = input
         .split_whitespace()
         .map(|x| x.parse::<i32>().unwrap())

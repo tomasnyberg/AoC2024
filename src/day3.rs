@@ -1,8 +1,4 @@
-use std::{
-    io::{self, Read},
-    iter::Peekable,
-    str::Chars,
-};
+use std::{iter::Peekable, str::Chars};
 
 const MUL: [char; 3] = ['m', 'u', 'l'];
 
@@ -141,9 +137,7 @@ pub fn part_two(input: &str) -> i32 {
     parse(input, true)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let part_one_result = part_one(&input);
     let part_two_result = part_two(&input);
     println!("{}", part_one_result);

@@ -1,11 +1,8 @@
 use std::collections::HashMap;
-use std::io::{self, Read};
 
 use itertools::Itertools;
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut adj: HashMap<&str, Vec<&str>> = HashMap::new();
     input.lines().for_each(|line| {
         let parts: Vec<&str> = line.split('-').collect();

@@ -1,14 +1,10 @@
-use std::io::{self, Read};
-
 fn evolve(mut secret: i64) -> i64 {
     secret ^= secret << 6 & 0xFFFFFF;
     secret ^= secret >> 5 & 0xFFFFFF;
     secret ^ secret << 11 & 0xFFFFFF
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let nums: Vec<i64> = input.lines().map(|line| line.parse().unwrap()).collect();
     let mut bananas = vec![0; 1 << 20];
     let mut seen = vec![2000; 1 << 20];

@@ -1,5 +1,3 @@
-use std::io::{self, Read};
-
 const XMAS: [char; 4] = ['X', 'M', 'A', 'S'];
 
 const DIRS8: [(i32, i32); 8] = [
@@ -67,9 +65,7 @@ fn find_results(matrix: &[Vec<char>]) -> (i32, i32) {
     (part_one_result, part_two_result)
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let matrix: Vec<Vec<char>> = input
         .lines()
         .map(|line| line.chars().collect::<Vec<char>>())

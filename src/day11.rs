@@ -1,7 +1,4 @@
-use std::{
-    collections::HashMap,
-    io::{self, Read},
-};
+use std::collections::HashMap;
 
 pub fn digit_count(mut x: i64) -> i32 {
     let mut result = 0;
@@ -46,9 +43,7 @@ pub fn number_five_iters(x: i64) -> HashMap<i64, i64> {
     result
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let stones: Vec<i64> = input
         .trim()
         .split(' ')

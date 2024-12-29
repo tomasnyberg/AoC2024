@@ -1,8 +1,4 @@
-use std::io::{self, Read};
-
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let mut locks: Vec<u32> = Vec::new();
     let mut keys: Vec<u32> = Vec::new();

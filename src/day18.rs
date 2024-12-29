@@ -1,7 +1,4 @@
-use std::{
-    collections::VecDeque,
-    io::{self, Read},
-};
+use std::collections::VecDeque;
 
 const DIRS4: [(i32, i32); 4] = [(1, 0), (0, 1), (0, -1), (-1, 0)];
 
@@ -35,9 +32,7 @@ fn bfs(grid: &[Vec<i32>], n: usize) -> i32 {
     0
 }
 
-pub fn solve() {
-    let mut input = String::new();
-    io::stdin().read_to_string(&mut input).unwrap();
+pub fn solve(input: String) {
     let mut bytes: Vec<(i32, i32)> = Vec::new();
     let mut n: usize = 7;
     input.lines().for_each(|line| {
